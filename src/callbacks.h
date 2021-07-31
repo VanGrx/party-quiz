@@ -1,0 +1,22 @@
+#ifndef CALLBACKS_H
+#define CALLBACKS_H
+
+#include "question.h"
+#include <iostream>
+#include <string>
+#include <vector>
+
+class callbackListener {
+
+public:
+  // Scoreboard callbacks
+  virtual void gameInitCallback(int playerCount) = 0;
+  virtual std::vector<std::pair<std::string, unsigned int>> getScores() = 0;
+  virtual Question getQuestion() = 0;
+
+  // Player callbacks
+  virtual void playerEntered(int id, std::string username) = 0;
+  virtual void answerGiven(int id, int answerGiven) = 0;
+};
+
+#endif // CALLBACKS_H

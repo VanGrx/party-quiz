@@ -36,14 +36,6 @@ listener::listener(net::io_context &ioc, tcp::endpoint endpoint,
 
 void listener::run() { do_accept(); }
 
-void listener::playGame() {
-
-  int k = 0;
-  while (true) {
-    std::cout << k++ << std::endl;
-  }
-}
-
 void listener::do_accept() {
   // The new connection gets its own strand
   acceptor_.async_accept(
@@ -56,14 +48,37 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
     fail(ec, "accept");
   } else {
     // Create the session and run it
-    sessions.emplace_back(
-        std::make_shared<session>(std::move(socket), doc_root_));
+    sessions.emplace_back(std::make_shared<session>(
+        std::move(socket), doc_root_,
+        std::static_pointer_cast<callbackListener>(shared_from_this())));
 
     sessions.back()->run();
-
-    gameThread = std::thread(&listener::playGame, this);
   }
 
   // Accept another connection
   do_accept();
+}
+
+//////////////////////////////////////////////////////////////////////////
+///Callbacks
+
+void listener::gameInitCallback(int playerCount) {
+
+  std::cout << "GAME INIT CALLBACK!!! BRAVO GRKI" << playerCount << std::endl;
+}
+
+std::vector<std::pair<std::string, unsigned int>> listener::getScores() {
+
+  return {};
+}
+
+Question listener::getQuestion() { return Question(); }
+
+// Player callbacks
+void listener::playerEntered(int id, std::string username) {
+  std::cout << "player entered" << id << " " << username;
+}
+
+void listener::answerGiven(int id, int answerGiven) {
+  std::cout << "player entered" << id << " " << answerGiven;
 }

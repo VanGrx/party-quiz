@@ -14,12 +14,15 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <thread>
 #include <vector>
 
+#include "actor.h"
+#include "callbacks.h"
 #include "pages.h"
 #include "player.h"
 #include "utils.h"
+
+class listener;
 
 namespace beast = boost::beast;   // from <boost/beast.hpp>
 namespace http = beast::http;     // from <boost/beast/http.hpp>
@@ -64,14 +67,22 @@ class session : public std::enable_shared_from_this<session> {
   std::shared_ptr<void> res_;
   send_lambda lambda_;
 
+  std::shared_ptr<callbackListener> callbackReceiver;
+
+  bool gameReady = false;
   bool isPlayer = false;
-  Player player;
+
+  // Actor fields
+  std::mutex actorMutex;
+  std::shared_ptr<Actor> actor;
 
 public:
   // Take ownership of the stream
   session(tcp::socket &&socket,
-          std::shared_ptr<std::string const> const &doc_root)
-      : stream_(std::move(socket)), doc_root_(doc_root), lambda_(*this) {
+          std::shared_ptr<std::string const> const &doc_root,
+          std::shared_ptr<callbackListener> _listener)
+      : stream_(std::move(socket)), doc_root_(doc_root), lambda_(*this),
+        callbackReceiver(_listener) {
 
     std::cout << "Creating session" << std::endl;
   }

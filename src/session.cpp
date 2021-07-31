@@ -1,4 +1,5 @@
 #include "session.h"
+#include "referee.h"
 
 void session::do_close() {
   // Send a TCP shutdown
@@ -175,7 +176,12 @@ void session::handle_request(
 
     int playerNumber = stoi(parsed_value["numberOfPlayers"]);
 
-    std::cout << playerNumber << std::endl;
+    actorMutex.lock();
+    actor = std::static_pointer_cast<Actor>(
+        std::make_shared<Referee>(playerNumber));
+    actorMutex.unlock();
+
+    callbackReceiver->gameInitCallback(playerNumber);
 
     path = path_cat(doc_root, pages::scoreboardPage);
 

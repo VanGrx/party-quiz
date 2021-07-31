@@ -13,9 +13,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <thread>
 #include <vector>
 
+#include "callbacks.h"
 #include "game.h"
 #include "session.h"
 #include "utils.h"
@@ -26,24 +26,33 @@ namespace net = boost::asio;      // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
 // Accepts incoming connections and launches the sessions
-class listener : public std::enable_shared_from_this<listener> {
+class listener : public std::enable_shared_from_this<listener>,
+                 public callbackListener {
   net::io_context &ioc_;
   tcp::acceptor acceptor_;
   std::shared_ptr<std::string const> doc_root_;
 
   Game game;
-  std::thread gameThread;
 
+  std::mutex sessionsMutex;
   std::vector<std::shared_ptr<session>> sessions;
 
 public:
+  // Scoreboard callback
+  virtual void gameInitCallback(int playerCount) override;
+  virtual std::vector<std::pair<std::string, unsigned int>>
+  getScores() override;
+  virtual Question getQuestion() override;
+
+  // Player callbacks
+  virtual void playerEntered(int id, std::string username) override;
+  virtual void answerGiven(int id, int answerGiven) override;
+
   listener(net::io_context &ioc, tcp::endpoint endpoint,
            std::shared_ptr<std::string const> const &doc_root);
 
   // Start accepting incoming connections
   void run();
-
-  void playGame();
 
 private:
   void do_accept();
