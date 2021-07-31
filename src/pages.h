@@ -3,13 +3,11 @@
 
 #include <string>
 
-namespace pages{
+namespace pages {
 
 const std::string scoreboardPage = "/scoreboard.html";
-const std::string playerPage     = "/player.html";
+const std::string playerPage = "/player.html";
 
-
-
-};
+}; // namespace pages
 
 #endif // PAGES_H
