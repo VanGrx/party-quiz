@@ -8,6 +8,7 @@
 Game::Game() {}
 
 Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {
+  // TODO: Collect questions in separate thread
   getQuestions();
   gameCreated = true;
 }

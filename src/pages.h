@@ -5,6 +5,7 @@
 
 namespace pages {
 
+const std::string initPage = "/index.html";
 const std::string scoreboardPage = "/scoreboard.html";
 const std::string playerPage = "/player.html";
 

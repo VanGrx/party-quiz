@@ -1,4 +1,5 @@
 #include "session.h"
+#include "pages.h"
 #include "referee.h"
 
 void session::do_close() {
@@ -67,6 +68,41 @@ void session::on_write(bool close, beast::error_code ec,
   do_read();
 }
 
+template <class Body, class Allocator>
+bool session::checkRequest(
+    http::request<Body, http::basic_fields<Allocator>> &req) {
+  // Make sure we can handle the method
+  if (req.method() != http::verb::get && req.method() != http::verb::post)
+    return false;
+
+  // Request path must be absolute and not contain "..".
+  if (req.target().empty() || req.target()[0] != '/' ||
+      req.target().find("..") != beast::string_view::npos)
+    return false;
+
+  return true;
+}
+
+enum parseFromFileError
+session::parseBodyFromFile(const std::string path,
+                           http::file_body::value_type &body) {
+
+  beast::error_code ec;
+
+  // Attempt to open the file
+  body.open(path.c_str(), beast::file_mode::scan, ec);
+
+  // Handle the case where the file doesn't exist
+  if (ec == beast::errc::no_such_file_or_directory)
+    return parseFromFileError::NOT_FOUND;
+
+  // Handle an unknown error
+  if (ec)
+    return parseFromFileError::SERVER_ERROR;
+
+  return parseFromFileError::OK;
+}
+
 // This function produces an HTTP response for the given
 // request. The type of the response object depends on the
 // contents of the request, so the interface requires the
@@ -75,6 +111,7 @@ template <class Body, class Allocator, class Send>
 void session::handle_request(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
+
   // Returns a bad request response
   auto const bad_request = [&req](beast::string_view why) {
     http::response<http::string_body> res{http::status::bad_request,
@@ -111,49 +148,34 @@ void session::handle_request(
     return res;
   };
 
-  // Make sure we can handle the method
-  if (req.method() != http::verb::get && req.method() != http::verb::head &&
-      req.method() != http::verb::post)
-    return send(bad_request("Unknown HTTP-method"));
+  if (!checkRequest(req))
+    return send(bad_request("Illegal request"));
 
-  // Request path must be absolute and not contain "..".
-  if (req.target().empty() || req.target()[0] != '/' ||
-      req.target().find("..") != beast::string_view::npos)
-    return send(bad_request("Illegal request-target"));
-
-  // Build the path to the requested file
-  std::string path = path_cat(doc_root, req.target());
-  if (req.target().back() == '/')
-    path.append("index.html");
-
-  // Attempt to open the file
-  beast::error_code ec;
   http::file_body::value_type body;
-  body.open(path.c_str(), beast::file_mode::scan, ec);
 
-  // Handle the case where the file doesn't exist
-  if (ec == beast::errc::no_such_file_or_directory)
-    return send(not_found(req.target()));
-
-  // Handle an unknown error
-  if (ec)
-    return send(server_error(ec.message()));
-
-  // Cache the size since we need it after the move
-  auto const size = body.size();
-
-  // Respond to HEAD request
-  if (req.method() == http::verb::head) {
-    http::response<http::empty_body> res{http::status::ok, req.version()};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type(path));
-    res.content_length(size);
-    res.keep_alive(req.keep_alive());
-    return send(std::move(res));
-  }
+  // Parse the values given
+  std::map<std::string, std::string> parsed_values = parseBody(req.body());
 
   // Respond to GET request
   if (req.method() == http::verb::get) {
+
+    // TODO: Select page user wants to open first
+    std::string path = path_cat(doc_root, pages::initPage);
+
+    parseFromFileError errorCode = parseBodyFromFile(path, body);
+
+    switch (errorCode) {
+    case parseFromFileError::OK:
+      break;
+    case parseFromFileError::NOT_FOUND:
+      return send(not_found(req.target()));
+    case parseFromFileError::SERVER_ERROR:
+      return send(server_error("Internal server error"));
+    }
+
+    // Cache the size since we need it after the move
+    auto const size = body.size();
+
     http::response<http::file_body> res{
         std::piecewise_construct, std::make_tuple(std::move(body)),
         std::make_tuple(http::status::ok, req.version())};
@@ -166,15 +188,13 @@ void session::handle_request(
 
   // Respond to POST request
   if (req.method() == http::verb::post) {
-    // TODO: Start game session
+    // TODO: Get parameters and call the callback we need
 
-    std::map<std::string, std::string> parsed_value = parseBody(req.body());
-
-    if (parsed_value.size() != 1) {
+    if (parsed_values.size() != 1) {
       // Error
     }
 
-    int playerNumber = stoi(parsed_value["numberOfPlayers"]);
+    int playerNumber = stoi(parsed_values["numberOfPlayers"]);
 
     actorMutex.lock();
     actor = std::static_pointer_cast<Actor>(
@@ -183,19 +203,18 @@ void session::handle_request(
 
     callbackReceiver->gameInitCallback(playerNumber);
 
-    path = path_cat(doc_root, pages::scoreboardPage);
+    std::string path = path_cat(doc_root, pages::scoreboardPage);
 
-    // Attempt to open the file
-    http::file_body::value_type body;
-    body.open(path.c_str(), beast::file_mode::scan, ec);
+    parseFromFileError errorCode = parseBodyFromFile(path, body);
 
-    // Handle the case where the file doesn't exist
-    if (ec == beast::errc::no_such_file_or_directory)
+    switch (errorCode) {
+    case parseFromFileError::OK:
+      break;
+    case parseFromFileError::NOT_FOUND:
       return send(not_found(req.target()));
-
-    // Handle an unknown error
-    if (ec)
-      return send(server_error(ec.message()));
+    case parseFromFileError::SERVER_ERROR:
+      return send(server_error("Internal server error"));
+    }
 
     // Cache the size since we need it after the move
     auto const size = body.size();

@@ -99,6 +99,12 @@ public:
 
   void do_close();
 
+  template <class Body, class Allocator>
+  bool checkRequest(http::request<Body, http::basic_fields<Allocator>> &req);
+
+  enum parseFromFileError parseBodyFromFile(std::string path,
+                                            http::file_body::value_type &body);
+
   template <class Body, class Allocator, class Send>
   void handle_request(beast::string_view doc_root,
                       http::request<Body, http::basic_fields<Allocator>> &&req,
