@@ -23,8 +23,11 @@ public:
   bool nextRound();
   bool gameFinished();
   std::vector<std::pair<std::string, unsigned int>> getScores();
+  void playerAnswered(int id, int answerGiven);
 
   void print();
+
+  bool gameCreated = false;
 
 private:
   bool gameStarted = false;

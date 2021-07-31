@@ -13,7 +13,6 @@ public:
 
   void print();
 
-private:
   std::string question;
   std::vector<std::string> answers;
   int correctAnswerIndex;

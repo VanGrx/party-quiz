@@ -8,6 +8,8 @@
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 
+constexpr unsigned int POINTS_FOR_CORRECT_ANSWER = 10;
+
 void fail(beast::error_code ec, char const *what);
 
 // Append an HTTP rel-path to a local filesystem path.

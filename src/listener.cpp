@@ -60,23 +60,20 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 }
 
 //////////////////////////////////////////////////////////////////////////
-///Callbacks
+/// Callbacks
 
-void listener::gameInitCallback(int playerCount) {
-
-  std::cout << "GAME INIT CALLBACK!!! BRAVO GRKI" << playerCount << std::endl;
-}
+void listener::gameInitCallback(int playerCount) { game = Game(playerCount); }
 
 std::vector<std::pair<std::string, unsigned int>> listener::getScores() {
 
-  return {};
+  return game.getScores();
 }
 
-Question listener::getQuestion() { return Question(); }
+Question listener::getQuestion() { return game.giveQuestion(); }
 
 // Player callbacks
 void listener::playerEntered(int id, std::string username) {
-  std::cout << "player entered" << id << " " << username;
+  game.addPlayer(id, username);
 }
 
 void listener::answerGiven(int id, int answerGiven) {

@@ -9,6 +9,7 @@ Game::Game() {}
 
 Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {
   getQuestions();
+  gameCreated = true;
 }
 
 bool Game::gameReady() { return players.size() == playerNumber; }
@@ -32,13 +33,26 @@ std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   std::vector<std::pair<std::string, unsigned int>> scores;
 
   std::for_each(players.begin(), players.end(), [&scores](auto &player) {
-    scores.emplace_back(player.getUsername(), player.getScore());
+    scores.emplace_back(player.username, player.score);
   });
 
   sort(scores.begin(), scores.end(),
        [](const auto &p1, const auto &p2) { return p1.second > p2.second; });
 
   return scores;
+}
+
+void Game::playerAnswered(int id, int answerGiven) {
+
+  auto player =
+      find_if(players.begin(), players.end(),
+              [&id](const auto &currPlayer) { return currPlayer.id == id; });
+
+  // If player already answered, ignore
+  if (player->questionsAnswered >= currQuestion)
+    return;
+
+  player->gaveAnswer(giveQuestion().correctAnswerIndex == answerGiven);
 }
 
 void Game::getQuestions() {

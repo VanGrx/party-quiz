@@ -10,11 +10,9 @@ public:
   Player(int _id, std::string _username)
       : id{_id}, username{_username}, score{0} {};
 
-  std::string getUsername() { return username; }
+  void gaveAnswer(bool correct);
 
-  unsigned int getScore() { return score; }
-
-private:
+  unsigned int questionsAnswered = 0;
   int id;
   std::string username;
   unsigned int score;
