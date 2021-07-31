@@ -6,10 +6,10 @@ Server::Server()
 }
 
 
-Server::Server(int argc, char* argv[]):address{net::ip::make_address(argv[1])},
+Server::Server(char* argv[]):threads{std::max<int>(1, std::atoi(argv[4]))},
+                                       address{net::ip::make_address(argv[1])},
                                        port{static_cast<unsigned short>(std::atoi(argv[2]))},
                                        doc_root{std::make_shared<std::string>(argv[3])},
-                                       threads{std::max<int>(1, std::atoi(argv[4]))},
                                        ioc{std::max<int>(1, std::atoi(argv[4]))}{
 
 

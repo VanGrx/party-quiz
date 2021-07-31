@@ -10,11 +10,11 @@ public:
 
     Player(int _id, std::string _username):id{_id},username{_username},score{0}{};
 
-    const std::string getUsername(){
+    std::string getUsername(){
         return username;
     }
 
-    const unsigned int getScore(){
+    unsigned int getScore(){
         return score;
     }
 

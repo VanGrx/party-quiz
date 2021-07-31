@@ -5,7 +5,8 @@
 
 namespace pages{
 
-const std::string scoreboardPage = "/kviz.html";
+const std::string scoreboardPage = "/scoreboard.html";
+const std::string playerPage     = "/player.html";
 
 
 

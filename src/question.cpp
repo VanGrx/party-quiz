@@ -23,7 +23,7 @@ Question::Question(const std::string& q, const std::string& a1, const std::strin
 
     std::shuffle(answers.begin(), answers.end(), g);
 
-    for(int i=0;i<answers.size();i++)
+    for(size_t i=0;i<answers.size();i++)
         if(answers[i] == correctA)
         {
             correctAnswerIndex = i;
@@ -39,7 +39,7 @@ void Question::print(){
 
     std::cout<<question<<std::endl;
     std::cout<<"Answers:"<<std::endl;
-    for(int i=0; i< answers.size();i++)
+    for(size_t i=0; i< answers.size();i++)
         std::cout<<i<<" "<<answers[i]<<std::endl;
 
     std::cout<<"Correct answer: "<<answers[correctAnswerIndex]<<std::endl;

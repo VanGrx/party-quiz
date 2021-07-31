@@ -32,7 +32,9 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    Server server(argc, argv);
+    //TODO: Parse argv and check if server can be created
+
+    Server server(argv);
 
     server.run();
 

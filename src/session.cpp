@@ -206,6 +206,8 @@ void session::handle_request(
 
         int playerNumber = stoi(parsed_value["numberOfPlayers"]);
 
+        std::cout<<playerNumber<<std::endl;
+
         path = path_cat(doc_root, pages::scoreboardPage);
 
 

@@ -28,17 +28,18 @@ class Server
 public:
     Server();
 
-    Server(int argc, char* argv[]);
+    Server(char* argv[]);
 
     void run();
 
 private:
-    net::io_context ioc;
+    int threads;
     boost::asio::ip::address address;
     unsigned short port;
     std::shared_ptr<std::string> doc_root;
     std::shared_ptr<listener> connectionListener;
-    int threads;
+    net::io_context ioc;
+
 };
 
 #endif // SERVER_H
