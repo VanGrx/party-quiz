@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(KvizServer LANGUAGES CXX)
+project(PartyQuiz LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,6 +39,6 @@ set(source_files
     src/player.cpp
     )
 
-add_executable(KvizServer ${source_files} ${include_files})
+add_executable(PartyQuiz ${source_files} ${include_files})
 
-target_link_libraries(KvizServer ${Boost_LIBRARIES} ${CURL_LIBRARIES} Threads::Threads)
+target_link_libraries(PartyQuiz ${Boost_LIBRARIES} ${CURL_LIBRARIES} Threads::Threads)
