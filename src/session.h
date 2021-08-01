@@ -71,6 +71,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   bool gameReady = false;
   bool isPlayer = false;
+  unsigned int id = 0;
 
   // Actor fields
   std::mutex actorMutex;
@@ -98,6 +99,10 @@ public:
                 std::size_t bytes_transferred);
 
   void do_close();
+
+  void generateID();
+
+  bool isInit();
 
   template <class Body, class Allocator>
   bool checkRequest(http::request<Body, http::basic_fields<Allocator>> &req);

@@ -13,6 +13,8 @@ Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {}
 void Game::createGame(unsigned int _playerNumber) {
   clearGame();
   playerNumber = _playerNumber;
+  if (questionCacheThread.joinable())
+    questionCacheThread.join();
   questionCacheThread = std::thread(&Game::getQuestions, this);
 }
 

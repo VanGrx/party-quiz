@@ -80,10 +80,10 @@ bool Session::checkRequest(
       req.target().find("..") != beast::string_view::npos)
     return false;
 
-  //Allow only init and playerInit pages
-  if(req.target() != "/" && req.target() != pages::initPage && req.target() != pages::playerInitPage)
-      return false;
-
+  // Allow only init and playerInit pages
+  if (req.target() != "/" && req.target() != pages::initPage &&
+      req.target() != pages::playerInitPage)
+    return false;
 
   return true;
 }
@@ -106,6 +106,14 @@ Session::parseBodyFromFile(const std::string path,
     return parseFromFileError::SERVER_ERROR;
 
   return parseFromFileError::OK;
+}
+
+bool Session::isInit() { return id != 0; }
+
+void Session::generateID() {
+
+  srand(time(NULL));
+  id = rand() % MAX_USERS + 1;
 }
 
 // This function produces an HTTP response for the given
@@ -159,13 +167,35 @@ void Session::handle_request(
   http::file_body::value_type body;
 
   // Parse the values given
-  std::map<std::string, std::string> parsed_values = parseBody(req.body());
+  std::map<std::string, std::string> parsed_values =
+      parseRequestBody(req.body());
+
+  std::string path;
+
+  const bool isScoreboardRequest =
+      (req.target() == "/" || req.target() == pages::initPage);
+  const bool isPlayerRequest = (req.target() == pages::playerInitPage);
+
+  // TODO: Kick the cheater?
+  if (isInit() && (isPlayer != isPlayerRequest))
+    return send(bad_request("Illegal request...cheater!"));
+
+  if (!isInit())
+    generateID();
 
   // Respond to GET request
   if (req.method() == http::verb::get) {
 
-    // TODO: Select page user wants to open first
-    std::string path = path_cat(doc_root, pages::initPage);
+    // Player called
+
+    if (isPlayerRequest) {
+      path = path_cat(doc_root, pages::playerInitPage);
+
+    }
+    // Scoreboard called
+    else if (isScoreboardRequest) {
+      path = path_cat(doc_root, pages::initPage);
+    }
 
     parseFromFileError errorCode = parseBodyFromFile(path, body);
 

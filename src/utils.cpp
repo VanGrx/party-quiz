@@ -110,7 +110,7 @@ std::string curlCollect(std::string url) {
   return readBuffer;
 }
 
-std::map<std::string, std::string> parseBody(const std::string &data) {
+std::map<std::string, std::string> parseRequestBody(const std::string &data) {
   enum class States { Name, Ignore, Value };
 
   std::map<std::string, std::string> parsed_values;

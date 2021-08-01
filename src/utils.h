@@ -11,7 +11,7 @@ namespace beast = boost::beast; // from <boost/beast.hpp>
 // ---------------------------------------------------------------------------------------
 // Game relative
 constexpr unsigned int POINTS_FOR_CORRECT_ANSWER = 10;
-
+constexpr unsigned int MAX_USERS = 10;
 // ---------------------------------------------------------------------------------------
 // Connection relative
 
@@ -28,7 +28,7 @@ beast::string_view mime_type(beast::string_view path);
 
 std::string curlCollect(std::string url);
 
-std::map<std::string, std::string> parseBody(const std::string &data);
+std::map<std::string, std::string> parseRequestBody(const std::string &data);
 
 static const std::string b =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; //=
