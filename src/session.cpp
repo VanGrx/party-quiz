@@ -80,6 +80,11 @@ bool Session::checkRequest(
       req.target().find("..") != beast::string_view::npos)
     return false;
 
+  //Allow only init and playerInit pages
+  if(req.target() != "/" && req.target() != pages::initPage && req.target() != pages::playerInitPage)
+      return false;
+
+
   return true;
 }
 
