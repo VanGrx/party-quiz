@@ -4,13 +4,24 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <thread>
 
 Game::Game() {}
 
-Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {
-  // TODO: Collect questions in separate thread
-  getQuestions();
-  gameCreated = true;
+Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {}
+
+void Game::createGame(unsigned int _playerNumber) {
+  clearGame();
+  playerNumber = _playerNumber;
+  questionCacheThread = std::thread(&Game::getQuestions, this);
+}
+
+void Game::clearGame() {
+  questions.clear();
+  players.clear();
+  currQuestion = 0;
+  gameCreated = false;
+  gameStarted = false;
 }
 
 bool Game::gameReady() { return players.size() == playerNumber; }
@@ -98,6 +109,12 @@ void Game::getQuestions() {
     questions.emplace_back(question, answers[0], answers[1], answers[2],
                            correctAnswer);
   }
+
+  // We set that everything is OK and game is created
+  gameMutex.lock();
+  gameCreated = true;
+  std::cout << "GAME CREATED" << std::endl;
+  gameMutex.unlock();
 }
 
 void Game::print() {

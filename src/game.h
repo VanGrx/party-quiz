@@ -2,6 +2,8 @@
 #define GAME_H
 
 #include <map>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include "player.h"
@@ -16,6 +18,9 @@ public:
   std::vector<Question> questions;
   std::vector<Player> players;
 
+  void createGame(unsigned int _playerNumber);
+  void clearGame();
+
   void getQuestions();
   bool gameReady();
   bool addPlayer(int id, std::string name);
@@ -27,7 +32,9 @@ public:
 
   void print();
 
+  std::mutex gameMutex;
   bool gameCreated = false;
+  std::thread questionCacheThread;
 
 private:
   bool gameStarted = false;

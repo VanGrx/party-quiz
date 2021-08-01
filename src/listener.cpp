@@ -62,7 +62,9 @@ void Listener::on_accept(beast::error_code ec, tcp::socket socket) {
 //////////////////////////////////////////////////////////////////////////
 /// Callbacks
 
-void Listener::gameInitCallback(int playerCount) { game = Game(playerCount); }
+void Listener::gameInitCallback(int playerCount) {
+  game.createGame(playerCount);
+}
 
 std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
 
