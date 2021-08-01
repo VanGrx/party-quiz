@@ -35,7 +35,7 @@ private:
   boost::asio::ip::address address;
   unsigned short port;
   std::shared_ptr<std::string> doc_root;
-  std::shared_ptr<listener> connectionListener;
+  std::shared_ptr<Listener> connectionListener;
   net::io_context ioc;
 };
 

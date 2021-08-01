@@ -8,7 +8,12 @@
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 
+// ---------------------------------------------------------------------------------------
+// Game relative
 constexpr unsigned int POINTS_FOR_CORRECT_ANSWER = 10;
+
+// ---------------------------------------------------------------------------------------
+// Connection relative
 
 enum parseFromFileError { OK = 0, NOT_FOUND, SERVER_ERROR };
 
@@ -72,5 +77,7 @@ public:
     return out;
   }
 };
+
+// ---------------------------------------------------------------------------------------
 
 #endif // UTILS_H

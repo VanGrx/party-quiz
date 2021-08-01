@@ -1,6 +1,6 @@
 #include "listener.h"
 
-listener::listener(net::io_context &ioc, tcp::endpoint endpoint,
+Listener::Listener(net::io_context &ioc, tcp::endpoint endpoint,
                    std::shared_ptr<std::string const> const &doc_root)
     : ioc_(ioc), acceptor_(net::make_strand(ioc)), doc_root_(doc_root) {
   beast::error_code ec;
@@ -34,23 +34,23 @@ listener::listener(net::io_context &ioc, tcp::endpoint endpoint,
   }
 }
 
-void listener::run() { do_accept(); }
+void Listener::run() { do_accept(); }
 
-void listener::do_accept() {
+void Listener::do_accept() {
   // The new connection gets its own strand
   acceptor_.async_accept(
       net::make_strand(ioc_),
-      beast::bind_front_handler(&listener::on_accept, shared_from_this()));
+      beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
 }
 
-void listener::on_accept(beast::error_code ec, tcp::socket socket) {
+void Listener::on_accept(beast::error_code ec, tcp::socket socket) {
   if (ec) {
     fail(ec, "accept");
   } else {
     // Create the session and run it
-    sessions.emplace_back(std::make_shared<session>(
+    sessions.emplace_back(std::make_shared<Session>(
         std::move(socket), doc_root_,
-        std::static_pointer_cast<callbackListener>(shared_from_this())));
+        std::static_pointer_cast<CallbackListener>(shared_from_this())));
 
     sessions.back()->run();
   }
@@ -62,20 +62,20 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 //////////////////////////////////////////////////////////////////////////
 /// Callbacks
 
-void listener::gameInitCallback(int playerCount) { game = Game(playerCount); }
+void Listener::gameInitCallback(int playerCount) { game = Game(playerCount); }
 
-std::vector<std::pair<std::string, unsigned int>> listener::getScores() {
+std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
 
   return game.getScores();
 }
 
-Question listener::getQuestion() { return game.giveQuestion(); }
+Question Listener::getQuestion() { return game.giveQuestion(); }
 
 // Player callbacks
-void listener::playerEntered(int id, std::string username) {
+void Listener::playerEntered(int id, std::string username) {
   game.addPlayer(id, username);
 }
 
-void listener::answerGiven(int id, int answerGiven) {
+void Listener::answerGiven(int id, int answerGiven) {
   std::cout << "player entered" << id << " " << answerGiven;
 }

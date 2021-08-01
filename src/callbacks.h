@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-class callbackListener {
+class CallbackListener {
 
 public:
   // Scoreboard callbacks

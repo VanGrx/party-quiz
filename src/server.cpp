@@ -12,7 +12,7 @@ Server::Server(char *argv[])
 
   // Create and launch a listening port
   connectionListener =
-      std::make_shared<listener>(ioc, tcp::endpoint{address, port}, doc_root);
+      std::make_shared<Listener>(ioc, tcp::endpoint{address, port}, doc_root);
 
   connectionListener->run();
 }
