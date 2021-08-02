@@ -198,7 +198,6 @@ void Session::handlePlayerRequest(
 
   // Respond to POST request
   if (req.method() == http::verb::post) {
-    // TODO: Get parameters and call the callback we need
 
     // Parse the values given
     std::map<std::string, std::string> parsed_values =
@@ -282,7 +281,6 @@ void Session::handleScoreboardRequest(
 
   // Respond to POST request
   if (req.method() == http::verb::post) {
-    // TODO: Get parameters and call the callback we need
 
     // Parse the values given
     std::map<std::string, std::string> parsed_values =
