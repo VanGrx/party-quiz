@@ -28,7 +28,7 @@ $.ajax({
   url: "./playerInit.html",
   data: data,
   success: function(data){
-          $("html").html(data);
+           window.location.href = "."+data["igor"];
       },
   error: function(error){
     console.log("Error:");
