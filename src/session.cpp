@@ -4,6 +4,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+
 void Session::do_close() {
   // Send a TCP shutdown
   beast::error_code ec;
@@ -11,6 +12,8 @@ void Session::do_close() {
 
   // At this point the connection is closed gracefully
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void Session::run() {
   // We need to be executing within a strand to perform async operations
@@ -21,6 +24,8 @@ void Session::run() {
       stream_.get_executor(),
       beast::bind_front_handler(&Session::do_read, shared_from_this()));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void Session::do_read() {
   // Make the request empty before reading,
@@ -36,6 +41,8 @@ void Session::do_read() {
       beast::bind_front_handler(&Session::on_read, shared_from_this()));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 void Session::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
 
@@ -49,6 +56,8 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   // Send the response
   handle_request(*doc_root_, std::move(req_), lambda_);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void Session::on_write(bool close, beast::error_code ec,
                        std::size_t bytes_transferred) {
@@ -70,6 +79,8 @@ void Session::on_write(bool close, beast::error_code ec,
   do_read();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 template <class Body, class Allocator>
 bool Session::checkRequest(
     http::request<Body, http::basic_fields<Allocator>> &req) {
@@ -84,6 +95,8 @@ bool Session::checkRequest(
 
   return true;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 http::status Session::parseBodyFromFile(const std::string path,
                                         http::file_body::value_type &body) {
@@ -104,13 +117,19 @@ http::status Session::parseBodyFromFile(const std::string path,
   return http::status::ok;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 bool Session::isInit() { return id != 0; }
+
+//-------------------------------------------------------------------------------------------------
 
 void Session::generateID() {
 
   srand(time(NULL));
   id = rand() % MAX_USERS + 1;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 // This function produces an HTTP response for the given
 // request. The type of the response object depends on the
@@ -156,6 +175,8 @@ void Session::handle_request(
   }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 template <class Body, class Allocator, class Send>
 void Session::handlePlayerRequest(
     beast::string_view doc_root,
@@ -172,6 +193,9 @@ void Session::handlePlayerRequest(
                                  std::move(req), send);
   }
 }
+
+//-------------------------------------------------------------------------------------------------
+
 template <class Body, class Allocator, class Send>
 void Session::handleScoreboardRequest(
     beast::string_view doc_root,
@@ -265,6 +289,8 @@ void Session::handleScoreboardRequest(
   }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 template <class Body, class Allocator>
 http::response<http::string_body> Session::createErrorResponse(
     http::request<Body, http::basic_fields<Allocator>> &&req,
@@ -284,6 +310,8 @@ http::response<http::string_body> Session::createErrorResponse(
   res.prepare_payload();
   return res;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 template <class Body, class Allocator, class Send>
 void Session::returnRequestedPage(
@@ -317,6 +345,8 @@ void Session::returnRequestedPage(
   res.keep_alive(req.keep_alive());
   return send(std::move(res));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 template <class Body, class Allocator, class Send>
 void Session::returnRequestedJSON(
