@@ -39,7 +39,7 @@ class Listener : public std::enable_shared_from_this<Listener>,
 
 public:
   // Scoreboard callback
-  virtual void gameInitCallback(int playerCount) override;
+  virtual void gameInitCallback(int id, int playerCount) override;
   virtual std::vector<std::pair<std::string, unsigned int>>
   getScores() override;
   virtual Question getQuestion() override;

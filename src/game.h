@@ -18,7 +18,7 @@ public:
   std::vector<Question> questions;
   std::vector<Player> players;
 
-  void createGame(unsigned int _playerNumber);
+  void createGame(int _id, unsigned int _playerNumber);
   void clearGame();
 
   void getQuestions();

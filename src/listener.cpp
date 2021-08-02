@@ -65,8 +65,8 @@ void Listener::on_accept(beast::error_code ec, tcp::socket socket) {
 //////////////////////////////////////////////////////////////////////////
 /// Callbacks
 
-void Listener::gameInitCallback(int playerCount) {
-  game.createGame(playerCount);
+void Listener::gameInitCallback(int id, int playerCount) {
+  game.createGame(id, playerCount);
 }
 
 std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
@@ -80,6 +80,8 @@ std::string Listener::getGameStatusJSONString() {
   rapidjson::Document d;
 
   d.SetObject();
+
+  d.AddMember("gameID", game.id, d.GetAllocator());
 
   d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
   d.AddMember("gameReady", game.gameReady(), d.GetAllocator());

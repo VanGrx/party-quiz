@@ -126,7 +126,7 @@ bool Session::isInit() { return id != 0; }
 void Session::generateID() {
 
   srand(time(NULL));
-  id = rand() % MAX_USERS + 1;
+  id = rand() % MAX_ID + 1;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -159,10 +159,6 @@ void Session::handle_request(
   if (isInit() && (isPlayer != isPlayerRequest))
     return send(createErrorResponse(std::move(req), http::status::bad_request,
                                     "Illegal request...cheater!"));
-
-  // TODO: Init only after the POST method that make user enter the game
-  //  if (!isInit())
-  //    generateID();
 
   // Player called
   if (isPlayerRequest) {
@@ -239,17 +235,20 @@ void Session::handleScoreboardRequest(
         parseRequestBody(req.body());
 
     if (parsed_values.size() != 1) {
-      // Error
+      // TODO : Error
     }
 
     int playerNumber = stoi(parsed_values["numberOfPlayers"]);
+
+    if (!isInit())
+      generateID();
 
     actorMutex.lock();
     actor = std::static_pointer_cast<Actor>(
         std::make_shared<Referee>(playerNumber));
     actorMutex.unlock();
 
-    callbackReceiver->gameInitCallback(playerNumber);
+    callbackReceiver->gameInitCallback(id, playerNumber);
 
     rapidjson::Document d;
 

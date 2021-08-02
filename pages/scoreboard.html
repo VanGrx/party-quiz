@@ -19,6 +19,8 @@ var readyText = status["gameReady"] == true ? "DA" : "NE";
 var startedText = status["gameStarted"] == true ? "DA" : "NE";
 
 
+
+document.getElementById("gameID").innerHTML = status["gameID"];
 document.getElementById("playersConnected").innerHTML = playerText;
 document.getElementById("questions").innerHTML = questionText;
 document.getElementById("gameCreated").innerHTML = createdText;
@@ -64,6 +66,9 @@ window.setInterval(function(){
 
 </head>
 <body>
+<label >ID igre:</label>
+<label id="gameID">0</label>
+<br/>
 <label >Pitanja inicijalizovana:</label>
 <label id="gameCreated">Ne</label>
 <br/>

@@ -11,7 +11,7 @@ namespace beast = boost::beast; // from <boost/beast.hpp>
 // ---------------------------------------------------------------------------------------
 // Game relative
 constexpr unsigned int POINTS_FOR_CORRECT_ANSWER = 10;
-constexpr unsigned int MAX_USERS = 10;
+constexpr unsigned int MAX_ID = 1000000;
 // ---------------------------------------------------------------------------------------
 // Connection relative
 
