@@ -118,9 +118,8 @@ std::map<std::string, std::string> parseRequestBody(const std::string &data) {
   std::string value;
 
   States state = States::Name;
-  for (size_t i = 0; i < data.length(); i++) {
+  for (char c: data) {
 
-    char c = data[i];
 
     switch (state) {
     case States::Name:
@@ -137,15 +136,18 @@ std::map<std::string, std::string> parseRequestBody(const std::string &data) {
       }
       break;
     case States::Value:
-      if (c != '&' && i != data.length() - 1) {
+      if (c != '&') {
         value += c;
       } else {
         parsed_values.insert(std::make_pair(name, value));
         name = "";
         value = "";
+        state = States::Name;
       }
       break;
     }
   }
+  if(value != "")
+      parsed_values.insert(std::make_pair(name, value));
   return parsed_values;
 }
