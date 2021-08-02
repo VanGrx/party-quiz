@@ -224,7 +224,7 @@ void Session::handlePlayerRequest(
 
     d.SetObject();
 
-    d.AddMember("igor", "/scoreboard.html", d.GetAllocator());
+    d.AddMember("igor", "/player.html", d.GetAllocator());
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer,
@@ -273,6 +273,10 @@ void Session::handleScoreboardRequest(
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["gameStart"] != "") {
       callbackReceiver->startGame();
+    } else if (parsed_values["scores"] != "") {
+      std::string message = callbackReceiver->getScoresJSONString();
+
+      return returnRequestedJSON(message, std::move(req), send);
     }
   }
 

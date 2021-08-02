@@ -124,6 +124,38 @@ std::string Listener::getGameStatusJSONString() {
   return buffer.GetString();
 }
 
+std::string Listener::getScoresJSONString() {
+  rapidjson::Document d;
+
+  d.SetArray();
+
+  if (game.gameStarted) {
+    auto results = game.getScores();
+
+    for (auto result : results) {
+      rapidjson::Value res(rapidjson::kObjectType);
+
+      res.AddMember("id", 0, d.GetAllocator());
+
+      rapidjson::Value username(result.first.c_str(), result.first.size(),
+                                d.GetAllocator());
+      res.AddMember("username", username, d.GetAllocator());
+      res.AddMember("score", result.second, d.GetAllocator());
+
+      d.PushBack(res, d.GetAllocator());
+    }
+  }
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType,
+                    rapidjson::ASCII<>>
+      writer(buffer);
+
+  d.Accept(writer);
+
+  return buffer.GetString();
+}
+
 // Player callbacks
 bool Listener::playerEntered(int roomID, int id, std::string username) {
 

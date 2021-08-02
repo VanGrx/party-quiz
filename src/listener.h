@@ -45,6 +45,7 @@ public:
   virtual Question getQuestion() override;
   virtual void startGame() override;
   virtual std::string getGameStatusJSONString() override;
+  virtual std::string getScoresJSONString() override;
 
   // Player callbacks
   virtual bool playerEntered(int roomID, int id, std::string username) override;
