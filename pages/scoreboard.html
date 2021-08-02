@@ -54,7 +54,7 @@ if(status["gameReady"] == true && status["gameStarted"] == false){
   window.setInterval(function(){
     getScores();  //calling every .5 seconds
   }, 1000);
-} else if(status["gameStarted"] == true){
+} else if(status["gameOver"] == false){
   document.getElementById("pitanjeDiv").style.display = "block";
   document.getElementById("question").innerHTML = status["question"];
   document.getElementById("answer1").innerHTML = status["answers"][0];
@@ -63,6 +63,9 @@ if(status["gameReady"] == true && status["gameStarted"] == false){
   document.getElementById("answer4").innerHTML = status["answers"][3];
 
 
+
+} else{
+document.getElementById("pitanjeDiv").style.display = "none";
 
 }
 

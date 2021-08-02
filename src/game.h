@@ -27,14 +27,19 @@ public:
   Question giveQuestion();
   bool nextRound();
   bool gameFinished();
+  bool gameRunning();
   std::vector<std::pair<std::string, unsigned int>> getScores();
   void playerAnswered(int id, int answerGiven);
 
   void print();
 
+  void startGame();
+  void playGame();
+
   std::mutex gameMutex;
   bool gameCreated = false;
   std::thread questionCacheThread;
+  std::thread gamePlayingThread;
 
   int id = 0;
 

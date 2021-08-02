@@ -45,6 +45,8 @@ bool Game::nextRound() {
 
 bool Game::gameFinished() { return currQuestion == questions.size(); }
 
+bool Game::gameRunning() { return gameStarted && !gameFinished(); }
+
 std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   std::vector<std::pair<std::string, unsigned int>> scores;
 
@@ -119,6 +121,25 @@ void Game::getQuestions() {
   gameCreated = true;
   std::cout << "GAME CREATED" << std::endl;
   gameMutex.unlock();
+}
+
+void Game::startGame() {
+  if (gamePlayingThread.joinable())
+    gamePlayingThread.join();
+  gamePlayingThread = std::thread(&Game::playGame, this);
+}
+
+void Game::playGame() {
+
+  gameStarted = true;
+
+  using namespace std::chrono_literals;
+
+  while (!gameFinished()) {
+    std::this_thread::sleep_for(2s);
+
+    nextRound();
+  }
 }
 
 void Game::print() {

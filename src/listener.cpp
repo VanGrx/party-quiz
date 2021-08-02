@@ -78,7 +78,7 @@ Question Listener::getQuestion() { return game.giveQuestion(); }
 
 void Listener::startGame() {
   if (game.gameCreated && game.gameReady() && !game.gameStarted)
-    game.gameStarted = true;
+    game.startGame();
 }
 
 std::string Listener::getGameStatusJSONString() {
@@ -91,12 +91,13 @@ std::string Listener::getGameStatusJSONString() {
   d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
   d.AddMember("gameReady", game.gameReady(), d.GetAllocator());
   d.AddMember("gameStarted", game.gameStarted, d.GetAllocator());
+  d.AddMember("gameOver", !game.gameRunning(), d.GetAllocator());
   d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
   d.AddMember("playersEntered", game.players.size(), d.GetAllocator());
   d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
-  if (game.gameStarted) {
+  if (game.gameRunning()) {
     Question q = game.giveQuestion();
 
     rapidjson::Value jsonQ(q.question.c_str(), q.question.size(),
