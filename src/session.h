@@ -136,6 +136,12 @@ public:
   returnRequestedPage(const std::string &path,
                       http::request<Body, http::basic_fields<Allocator>> &&req,
                       Send &&send);
+
+  template <class Body, class Allocator, class Send>
+  void
+  returnRequestedJSON(const std::string &jsonString,
+                      http::request<Body, http::basic_fields<Allocator>> &&req,
+                      Send &&send);
 };
 
 #endif // SESSION_H

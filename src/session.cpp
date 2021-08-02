@@ -213,16 +213,7 @@ void Session::handleScoreboardRequest(
       d.Accept(writer);
       std::string message = buffer.GetString();
 
-      size_t size = message.size();
-
-      http::response<http::string_body> res{
-          std::piecewise_construct, std::make_tuple(std::move(message)),
-          std::make_tuple(http::status::ok, req.version())};
-      res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-      res.set(http::field::content_type, mime_type("path.json"));
-      res.content_length(size);
-      res.keep_alive(req.keep_alive());
-      return send(std::move(res));
+      return returnRequestedJSON(message, std::move(req), send);
     }
   }
 
@@ -322,6 +313,23 @@ void Session::returnRequestedPage(
       std::make_tuple(http::status::ok, req.version())};
   res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
   res.set(http::field::content_type, mime_type(path));
+  res.content_length(size);
+  res.keep_alive(req.keep_alive());
+  return send(std::move(res));
+}
+
+template <class Body, class Allocator, class Send>
+void Session::returnRequestedJSON(
+    const std::string &jsonString,
+    http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
+
+  size_t size = jsonString.size();
+
+  http::response<http::string_body> res{
+      std::piecewise_construct, std::make_tuple(std::move(jsonString)),
+      std::make_tuple(http::status::ok, req.version())};
+  res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+  res.set(http::field::content_type, mime_type("path.json"));
   res.content_length(size);
   res.keep_alive(req.keep_alive());
   return send(std::move(res));
