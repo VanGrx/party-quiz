@@ -12,7 +12,9 @@ function handleStatus(status){
 
 var playerText = status["playersEntered"]+"/"+status["playerNumber"];
 
-var questionText = status["currQuestion"]+"/"+status["totalQuestions"];
+var currQuestion = status["currQuestion"]+1;
+
+var questionText = currQuestion+"/"+status["totalQuestions"];
 
 var createdText = status["gameCreated"] == true ? "DA" : "NE";
 var readyText = status["gameReady"] == true ? "DA" : "NE";
@@ -27,7 +29,49 @@ document.getElementById("gameCreated").innerHTML = createdText;
 document.getElementById("gameReady").innerHTML = readyText;
 document.getElementById("gameStarted").innerHTML = startedText;
 
+
+
+if(status["gameReady"] == true && status["gameStarted"] == false){
+
+  startGame();
+} else if(status["gameStarted"] == true){
+  document.getElementById("pitanjeDiv").style.display = "block";
+  document.getElementById("question").innerHTML = status["question"];
+  document.getElementById("answer1").innerHTML = status["answers"][0];
+  document.getElementById("answer2").innerHTML = status["answers"][1];
+  document.getElementById("answer3").innerHTML = status["answers"][2];
+  document.getElementById("answer4").innerHTML = status["answers"][3];
+
+
+
 }
+
+}
+
+function startGame(){
+
+var data = {};
+
+data["gameStart"]="1";
+
+var res = JSON.stringify(data)
+
+$.ajax({
+  type: "GET",
+  url: "./scoreboard.html",
+  data: data,
+  success: function(data){
+        console.log("GAME STARTED!")
+
+      },
+  error: function(error){
+    console.log("Error:");
+    console.log(error);
+}
+});
+
+}
+
 
 function getStatus(){
 
@@ -84,7 +128,17 @@ window.setInterval(function(){
 <label id="playersConnected">0/0</label>
 <br/>
 
+
+<div id="pitanjeDiv" name="pitanjeDiv" style.display = "none">
+
 <label >Pitanje:</label>
 <label id="questions">0/0</label>
+<br/><br/>
+<label id="question"></label><br/>
+<label id="answer1"></label><br/>
+<label id="answer2"></label><br/>
+<label id="answer3"></label><br/>
+<label id="answer4"></label><br/>
+</div>
 </body>
 </html>

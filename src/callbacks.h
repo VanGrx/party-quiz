@@ -14,6 +14,7 @@ public:
   virtual std::vector<std::pair<std::string, unsigned int>> getScores() = 0;
   virtual Question getQuestion() = 0;
   virtual std::string getGameStatusJSONString() = 0;
+  virtual void startGame() = 0;
 
   // Player callbacks
   virtual bool playerEntered(int roomID, int id, std::string username) = 0;

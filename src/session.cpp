@@ -178,19 +178,18 @@ void Session::handlePlayerRequest(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
 
-
   if (req.method() == http::verb::get) {
 
-      // Parse the values given
-      std::map<std::string, std::string> parsed_values;
+    // Parse the values given
+    std::map<std::string, std::string> parsed_values;
 
-      std::string requestString = std::string(req.target());
-      size_t pos;
+    std::string requestString = std::string(req.target());
+    size_t pos;
 
-      if ((pos = requestString.find('?')) != std::string::npos) {
-        requestString = requestString.substr(pos + 1);
-        parsed_values = parseRequestBody(requestString);
-      }
+    if ((pos = requestString.find('?')) != std::string::npos) {
+      requestString = requestString.substr(pos + 1);
+      parsed_values = parseRequestBody(requestString);
+    }
     // Just give the page if no params are given
     if (parsed_values.empty())
       return returnRequestedPage(path_cat(doc_root, req.target()),
@@ -217,9 +216,9 @@ void Session::handlePlayerRequest(
 
     bool res = callbackReceiver->playerEntered(roomNumber, id, username);
 
-    if(res)
-        return send(createErrorResponse(std::move(req), http::status::bad_request,
-                                   "Illegal request. No such room!"));
+    if (res)
+      return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                      "Illegal request. No such room!"));
 
     rapidjson::Document d;
 
@@ -272,6 +271,8 @@ void Session::handleScoreboardRequest(
       std::string message = callbackReceiver->getGameStatusJSONString();
 
       return returnRequestedJSON(message, std::move(req), send);
+    } else if (parsed_values["gameStart"] != "") {
+      callbackReceiver->startGame();
     }
   }
 

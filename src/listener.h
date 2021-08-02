@@ -43,6 +43,7 @@ public:
   virtual std::vector<std::pair<std::string, unsigned int>>
   getScores() override;
   virtual Question getQuestion() override;
+  virtual void startGame() override;
   virtual std::string getGameStatusJSONString() override;
 
   // Player callbacks

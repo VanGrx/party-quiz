@@ -76,6 +76,11 @@ std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
 
 Question Listener::getQuestion() { return game.giveQuestion(); }
 
+void Listener::startGame() {
+  if (game.gameCreated && game.gameReady() && !game.gameStarted)
+    game.gameStarted = true;
+}
+
 std::string Listener::getGameStatusJSONString() {
   rapidjson::Document d;
 
@@ -91,6 +96,24 @@ std::string Listener::getGameStatusJSONString() {
   d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
+  if (game.gameStarted) {
+    Question q = game.giveQuestion();
+
+    rapidjson::Value jsonQ(q.question.c_str(), q.question.size(),
+                           d.GetAllocator());
+    d.AddMember("question", jsonQ, d.GetAllocator());
+
+    rapidjson::Value jsonA(rapidjson::kArrayType);
+
+    for (auto &it : q.answers) {
+      rapidjson::Value ans(it.c_str(), it.size(), d.GetAllocator());
+
+      jsonA.PushBack(ans, d.GetAllocator());
+    }
+
+    d.AddMember("answers", jsonA, d.GetAllocator());
+  }
+
   rapidjson::StringBuffer buffer;
   rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType,
                     rapidjson::ASCII<>>
@@ -102,10 +125,10 @@ std::string Listener::getGameStatusJSONString() {
 }
 
 // Player callbacks
-bool Listener::playerEntered(int roomID, int id, std::string username){
+bool Listener::playerEntered(int roomID, int id, std::string username) {
 
-    if(game.id != roomID)
-        return false;
+  if (game.id != roomID)
+    return false;
   game.addPlayer(id, username);
   return true;
 }
