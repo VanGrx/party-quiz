@@ -16,7 +16,7 @@ public:
   virtual std::string getGameStatusJSONString() = 0;
 
   // Player callbacks
-  virtual void playerEntered(int id, std::string username) = 0;
+  virtual bool playerEntered(int roomID, int id, std::string username) = 0;
   virtual void answerGiven(int id, int answerGiven) = 0;
 };
 

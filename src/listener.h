@@ -46,7 +46,7 @@ public:
   virtual std::string getGameStatusJSONString() override;
 
   // Player callbacks
-  virtual void playerEntered(int id, std::string username) override;
+  virtual bool playerEntered(int roomID, int id, std::string username) override;
   virtual void answerGiven(int id, int answerGiven) override;
 
   Listener(net::io_context &ioc, tcp::endpoint endpoint,

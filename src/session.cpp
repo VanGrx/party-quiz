@@ -178,15 +178,64 @@ void Session::handlePlayerRequest(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
 
-  // Parse the values given
-  std::map<std::string, std::string> parsed_values =
-      parseRequestBody(req.body());
 
   if (req.method() == http::verb::get) {
+
+      // Parse the values given
+      std::map<std::string, std::string> parsed_values;
+
+      std::string requestString = std::string(req.target());
+      size_t pos;
+
+      if ((pos = requestString.find('?')) != std::string::npos) {
+        requestString = requestString.substr(pos + 1);
+        parsed_values = parseRequestBody(requestString);
+      }
     // Just give the page if no params are given
     if (parsed_values.empty())
-      return returnRequestedPage(path_cat(doc_root, pages::playerInitPage),
+      return returnRequestedPage(path_cat(doc_root, req.target()),
                                  std::move(req), send);
+  }
+
+  // Respond to POST request
+  if (req.method() == http::verb::post) {
+    // TODO: Get parameters and call the callback we need
+
+    // Parse the values given
+    std::map<std::string, std::string> parsed_values =
+        parseRequestBody(req.body());
+
+    if (parsed_values.size() != 2) {
+      // TODO : Error
+    }
+
+    int roomNumber = stoi(parsed_values["roomNumber"]);
+    std::string username = parsed_values["username"];
+
+    if (!isInit())
+      generateID();
+
+    bool res = callbackReceiver->playerEntered(roomNumber, id, username);
+
+    if(res)
+        return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                   "Illegal request. No such room!"));
+
+    rapidjson::Document d;
+
+    d.SetObject();
+
+    d.AddMember("igor", "/scoreboard.html", d.GetAllocator());
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer,
+                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
+        writer(buffer);
+
+    d.Accept(writer);
+    std::string message = buffer.GetString();
+
+    return returnRequestedJSON(message, std::move(req), send);
   }
 }
 

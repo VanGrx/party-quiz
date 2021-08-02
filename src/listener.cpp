@@ -102,8 +102,12 @@ std::string Listener::getGameStatusJSONString() {
 }
 
 // Player callbacks
-void Listener::playerEntered(int id, std::string username) {
+bool Listener::playerEntered(int roomID, int id, std::string username){
+
+    if(game.id != roomID)
+        return false;
   game.addPlayer(id, username);
+  return true;
 }
 
 void Listener::answerGiven(int id, int answerGiven) {
