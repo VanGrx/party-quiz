@@ -107,11 +107,33 @@ public:
   template <class Body, class Allocator>
   bool checkRequest(http::request<Body, http::basic_fields<Allocator>> &req);
 
-  enum parseFromFileError parseBodyFromFile(std::string path,
-                                            http::file_body::value_type &body);
+  http::status parseBodyFromFile(std::string path,
+                                 http::file_body::value_type &body);
 
   template <class Body, class Allocator, class Send>
   void handle_request(beast::string_view doc_root,
+                      http::request<Body, http::basic_fields<Allocator>> &&req,
+                      Send &&send);
+
+  template <class Body, class Allocator, class Send>
+  void
+  handlePlayerRequest(beast::string_view doc_root,
+                      http::request<Body, http::basic_fields<Allocator>> &&req,
+                      Send &&send);
+
+  template <class Body, class Allocator, class Send>
+  void handleScoreboardRequest(
+      beast::string_view doc_root,
+      http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send);
+
+  template <class Body, class Allocator>
+  http::response<http::string_body>
+  createErrorResponse(http::request<Body, http::basic_fields<Allocator>> &&req,
+                      http::status status, std::string what);
+
+  template <class Body, class Allocator, class Send>
+  void
+  returnRequestedPage(const std::string &path,
                       http::request<Body, http::basic_fields<Allocator>> &&req,
                       Send &&send);
 };

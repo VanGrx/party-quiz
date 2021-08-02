@@ -15,8 +15,6 @@ constexpr unsigned int MAX_USERS = 10;
 // ---------------------------------------------------------------------------------------
 // Connection relative
 
-enum parseFromFileError { OK = 0, NOT_FOUND, SERVER_ERROR };
-
 void fail(beast::error_code ec, char const *what);
 
 // Append an HTTP rel-path to a local filesystem path.

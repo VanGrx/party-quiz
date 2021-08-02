@@ -36,6 +36,8 @@ public:
   bool gameCreated = false;
   std::thread questionCacheThread;
 
+  int id = 0;
+
 private:
   bool gameStarted = false;
   unsigned int playerNumber;

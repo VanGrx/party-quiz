@@ -88,9 +88,8 @@ bool Session::checkRequest(
   return true;
 }
 
-enum parseFromFileError
-Session::parseBodyFromFile(const std::string path,
-                           http::file_body::value_type &body) {
+http::status Session::parseBodyFromFile(const std::string path,
+                                        http::file_body::value_type &body) {
 
   beast::error_code ec;
 
@@ -99,13 +98,13 @@ Session::parseBodyFromFile(const std::string path,
 
   // Handle the case where the file doesn't exist
   if (ec == beast::errc::no_such_file_or_directory)
-    return parseFromFileError::NOT_FOUND;
+    return http::status::not_found;
 
   // Handle an unknown error
   if (ec)
-    return parseFromFileError::SERVER_ERROR;
+    return http::status::internal_server_error;
 
-  return parseFromFileError::OK;
+  return http::status::ok;
 }
 
 bool Session::isInit() { return id != 0; }
@@ -125,52 +124,9 @@ void Session::handle_request(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
 
-  // Returns a bad request response
-  auto const bad_request = [&req](beast::string_view why) {
-    http::response<http::string_body> res{http::status::bad_request,
-                                          req.version()};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = std::string(why);
-    res.prepare_payload();
-    return res;
-  };
-
-  // Returns a not found response
-  auto const not_found = [&req](beast::string_view target) {
-    http::response<http::string_body> res{http::status::not_found,
-                                          req.version()};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = "The resource '" + std::string(target) + "' was not found.";
-    res.prepare_payload();
-    return res;
-  };
-
-  // Returns a server error response
-  auto const server_error = [&req](beast::string_view what) {
-    http::response<http::string_body> res{http::status::internal_server_error,
-                                          req.version()};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = "An error occurred: '" + std::string(what) + "'";
-    res.prepare_payload();
-    return res;
-  };
-
   if (!checkRequest(req))
-    return send(bad_request("Illegal request"));
-
-  http::file_body::value_type body;
-
-  // Parse the values given
-  std::map<std::string, std::string> parsed_values =
-      parseRequestBody(req.body());
-
-  std::string path;
+    return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                    "Illegal request"));
 
   const bool isScoreboardRequest =
       (req.target() == "/" || req.target() == pages::initPage);
@@ -178,47 +134,54 @@ void Session::handle_request(
 
   // TODO: Kick the cheater?
   if (isInit() && (isPlayer != isPlayerRequest))
-    return send(bad_request("Illegal request...cheater!"));
+    return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                    "Illegal request...cheater!"));
 
-  if (!isInit())
-    generateID();
+  // TODO: Init only after the POST method that make user enter the game
+  //  if (!isInit())
+  //    generateID();
 
-  // Respond to GET request
+  // Player called
+  if (isPlayerRequest) {
+
+    handlePlayerRequest(doc_root, std::move(req), std::move(send));
+
+  } else if (isScoreboardRequest) {
+
+    handleScoreboardRequest(doc_root, std::move(req), std::move(send));
+  }
+}
+
+template <class Body, class Allocator, class Send>
+void Session::handlePlayerRequest(
+    beast::string_view doc_root,
+    http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
+
+  // Parse the values given
+  std::map<std::string, std::string> parsed_values =
+      parseRequestBody(req.body());
+
   if (req.method() == http::verb::get) {
+    // Just give the page if no params are given
+    if (parsed_values.empty())
+      return returnRequestedPage(path_cat(doc_root, pages::playerInitPage),
+                                 std::move(req), send);
+  }
+}
+template <class Body, class Allocator, class Send>
+void Session::handleScoreboardRequest(
+    beast::string_view doc_root,
+    http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
 
-    // Player called
+  // Parse the values given
+  std::map<std::string, std::string> parsed_values =
+      parseRequestBody(req.body());
 
-    if (isPlayerRequest) {
-      path = path_cat(doc_root, pages::playerInitPage);
-
-    }
-    // Scoreboard called
-    else if (isScoreboardRequest) {
-      path = path_cat(doc_root, pages::initPage);
-    }
-
-    parseFromFileError errorCode = parseBodyFromFile(path, body);
-
-    switch (errorCode) {
-    case parseFromFileError::OK:
-      break;
-    case parseFromFileError::NOT_FOUND:
-      return send(not_found(req.target()));
-    case parseFromFileError::SERVER_ERROR:
-      return send(server_error("Internal server error"));
-    }
-
-    // Cache the size since we need it after the move
-    auto const size = body.size();
-
-    http::response<http::file_body> res{
-        std::piecewise_construct, std::make_tuple(std::move(body)),
-        std::make_tuple(http::status::ok, req.version())};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type(path));
-    res.content_length(size);
-    res.keep_alive(req.keep_alive());
-    return send(std::move(res));
+  if (req.method() == http::verb::get) {
+    // Just give the page if no params are given
+    if (parsed_values.empty())
+      return returnRequestedPage(path_cat(doc_root, pages::initPage),
+                                 std::move(req), send);
   }
 
   // Respond to POST request
@@ -238,29 +201,60 @@ void Session::handle_request(
 
     callbackReceiver->gameInitCallback(playerNumber);
 
-    std::string path = path_cat(doc_root, pages::scoreboardPage);
-
-    parseFromFileError errorCode = parseBodyFromFile(path, body);
-
-    switch (errorCode) {
-    case parseFromFileError::OK:
-      break;
-    case parseFromFileError::NOT_FOUND:
-      return send(not_found(req.target()));
-    case parseFromFileError::SERVER_ERROR:
-      return send(server_error("Internal server error"));
-    }
-
-    // Cache the size since we need it after the move
-    auto const size = body.size();
-
-    http::response<http::file_body> res{
-        std::piecewise_construct, std::make_tuple(std::move(body)),
-        std::make_tuple(http::status::ok, req.version())};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type(path));
-    res.content_length(size);
-    res.keep_alive(req.keep_alive());
-    return send(std::move(res));
+    return returnRequestedPage(path_cat(doc_root, pages::scoreboardPage),
+                               std::move(req), send);
   }
+}
+
+template <class Body, class Allocator>
+http::response<http::string_body> Session::createErrorResponse(
+    http::request<Body, http::basic_fields<Allocator>> &&req,
+    http::status status, std::string what) {
+
+  if (status == http::status::not_found) {
+    what = "The resource '" + std::string(what) + "' was not found.";
+  } else if (status == http::status::internal_server_error) {
+    what = "An error occurred: '" + std::string(what) + "'";
+  }
+
+  http::response<http::string_body> res{status, req.version()};
+  res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+  res.set(http::field::content_type, "text/html");
+  res.keep_alive(req.keep_alive());
+  res.body() = std::string(what);
+  res.prepare_payload();
+  return res;
+}
+
+template <class Body, class Allocator, class Send>
+void Session::returnRequestedPage(
+    const std::string &path,
+    http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
+
+  http::file_body::value_type body;
+
+  http::status status = parseBodyFromFile(path, body);
+
+  switch (status) {
+  case http::status::not_found:
+    return send(
+        createErrorResponse(std::move(req), status, std::string(req.target())));
+  case http::status::internal_server_error:
+    return send(
+        createErrorResponse(std::move(req), status, "Internal server error"));
+  default:
+    break;
+  }
+
+  // Cache the size since we need it after the move
+  auto const size = body.size();
+
+  http::response<http::file_body> res{
+      std::piecewise_construct, std::make_tuple(std::move(body)),
+      std::make_tuple(http::status::ok, req.version())};
+  res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+  res.set(http::field::content_type, mime_type(path));
+  res.content_length(size);
+  res.keep_alive(req.keep_alive());
+  return send(std::move(res));
 }

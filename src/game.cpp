@@ -22,6 +22,7 @@ void Game::clearGame() {
   questions.clear();
   players.clear();
   currQuestion = 0;
+  id = 0;
   gameCreated = false;
   gameStarted = false;
 }
