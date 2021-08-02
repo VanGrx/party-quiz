@@ -1,7 +1,9 @@
 #include "session.h"
 #include "pages.h"
 #include "referee.h"
-
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 void Session::do_close() {
   // Send a TCP shutdown
   beast::error_code ec;
@@ -80,11 +82,6 @@ bool Session::checkRequest(
       req.target().find("..") != beast::string_view::npos)
     return false;
 
-  // Allow only init and playerInit pages
-  if (req.target() != "/" && req.target() != pages::initPage &&
-      req.target() != pages::playerInitPage)
-    return false;
-
   return true;
 }
 
@@ -128,9 +125,16 @@ void Session::handle_request(
     return send(createErrorResponse(std::move(req), http::status::bad_request,
                                     "Illegal request"));
 
+  std::string targetResource = std::string(req.target());
+
+  size_t pos = targetResource.find('?');
+  targetResource = targetResource.substr(0, pos);
+
   const bool isScoreboardRequest =
-      (req.target() == "/" || req.target() == pages::initPage);
-  const bool isPlayerRequest = (req.target() == pages::playerInitPage);
+      (req.target() == "/" || targetResource == pages::initPage ||
+       targetResource == pages::scoreboardPage);
+  const bool isPlayerRequest = (targetResource == pages::playerInitPage ||
+                                targetResource == pages::playerPage);
 
   // TODO: Kick the cheater?
   if (isInit() && (isPlayer != isPlayerRequest))
@@ -173,20 +177,62 @@ void Session::handleScoreboardRequest(
     beast::string_view doc_root,
     http::request<Body, http::basic_fields<Allocator>> &&req, Send &&send) {
 
-  // Parse the values given
-  std::map<std::string, std::string> parsed_values =
-      parseRequestBody(req.body());
-
   if (req.method() == http::verb::get) {
+
+    // Parse the values given
+    std::map<std::string, std::string> parsed_values;
+
+    std::string requestString = std::string(req.target());
+    size_t pos;
+    if ((pos = requestString.find('?')) != std::string::npos) {
+      requestString = requestString.substr(pos + 1);
+
+      parsed_values = parseRequestBody(requestString);
+    }
+
     // Just give the page if no params are given
+    std::string target = std::string(req.target());
+    if (target == "/")
+      target = pages::initPage;
     if (parsed_values.empty())
-      return returnRequestedPage(path_cat(doc_root, pages::initPage),
-                                 std::move(req), send);
+      return returnRequestedPage(path_cat(doc_root, target), std::move(req),
+                                 send);
+
+    if (parsed_values["status"] != "") {
+      rapidjson::Document d;
+
+      d.SetObject();
+
+      d.AddMember("igor", "praviIgor", d.GetAllocator());
+
+      rapidjson::StringBuffer buffer;
+      rapidjson::Writer<rapidjson::StringBuffer,
+                        rapidjson::Document::EncodingType, rapidjson::ASCII<>>
+          writer(buffer);
+
+      d.Accept(writer);
+      std::string message = buffer.GetString();
+
+      size_t size = message.size();
+
+      http::response<http::string_body> res{
+          std::piecewise_construct, std::make_tuple(std::move(message)),
+          std::make_tuple(http::status::ok, req.version())};
+      res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+      res.set(http::field::content_type, mime_type("path.json"));
+      res.content_length(size);
+      res.keep_alive(req.keep_alive());
+      return send(std::move(res));
+    }
   }
 
   // Respond to POST request
   if (req.method() == http::verb::post) {
     // TODO: Get parameters and call the callback we need
+
+    // Parse the values given
+    std::map<std::string, std::string> parsed_values =
+        parseRequestBody(req.body());
 
     if (parsed_values.size() != 1) {
       // Error
@@ -201,8 +247,30 @@ void Session::handleScoreboardRequest(
 
     callbackReceiver->gameInitCallback(playerNumber);
 
-    return returnRequestedPage(path_cat(doc_root, pages::scoreboardPage),
-                               std::move(req), send);
+    rapidjson::Document d;
+
+    d.SetObject();
+
+    d.AddMember("igor", "/scoreboard.html", d.GetAllocator());
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer,
+                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
+        writer(buffer);
+
+    d.Accept(writer);
+    std::string message = buffer.GetString();
+
+    size_t size = message.size();
+
+    http::response<http::string_body> res{
+        std::piecewise_construct, std::make_tuple(std::move(message)),
+        std::make_tuple(http::status::ok, req.version())};
+    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(http::field::content_type, mime_type("path.json"));
+    res.content_length(size);
+    res.keep_alive(req.keep_alive());
+    return send(std::move(res));
   }
 }
 
