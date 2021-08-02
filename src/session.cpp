@@ -264,16 +264,7 @@ void Session::handleScoreboardRequest(
     d.Accept(writer);
     std::string message = buffer.GetString();
 
-    size_t size = message.size();
-
-    http::response<http::string_body> res{
-        std::piecewise_construct, std::make_tuple(std::move(message)),
-        std::make_tuple(http::status::ok, req.version())};
-    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(http::field::content_type, mime_type("path.json"));
-    res.content_length(size);
-    res.keep_alive(req.keep_alive());
-    return send(std::move(res));
+    return returnRequestedJSON(message, std::move(req), send);
   }
 }
 
