@@ -1,4 +1,7 @@
 #include "listener.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 Listener::Listener(net::io_context &ioc, tcp::endpoint endpoint,
                    std::shared_ptr<std::string const> const &doc_root)
@@ -72,6 +75,29 @@ std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
 }
 
 Question Listener::getQuestion() { return game.giveQuestion(); }
+
+std::string Listener::getGameStatusJSONString() {
+  rapidjson::Document d;
+
+  d.SetObject();
+
+  d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
+  d.AddMember("gameReady", game.gameReady(), d.GetAllocator());
+  d.AddMember("gameStarted", game.gameStarted, d.GetAllocator());
+  d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
+  d.AddMember("playersEntered", game.players.size(), d.GetAllocator());
+  d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
+  d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType,
+                    rapidjson::ASCII<>>
+      writer(buffer);
+
+  d.Accept(writer);
+
+  return buffer.GetString();
+}
 
 // Player callbacks
 void Listener::playerEntered(int id, std::string username) {

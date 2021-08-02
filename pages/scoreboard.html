@@ -8,9 +8,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
 
+function handleStatus(status){
+
+var playerText = status["playersEntered"]+"/"+status["playerNumber"];
+
+var questionText = status["currQuestion"]+"/"+status["totalQuestions"];
+
+var createdText = status["gameCreated"] == true ? "DA" : "NE";
+var readyText = status["gameReady"] == true ? "DA" : "NE";
+var startedText = status["gameStarted"] == true ? "DA" : "NE";
 
 
-function startGame(){
+document.getElementById("playersConnected").innerHTML = playerText;
+document.getElementById("questions").innerHTML = questionText;
+document.getElementById("gameCreated").innerHTML = createdText;
+document.getElementById("gameReady").innerHTML = readyText;
+document.getElementById("gameStarted").innerHTML = startedText;
+
+}
+
+function getStatus(){
 
 var data = {};
 
@@ -26,7 +43,7 @@ $.ajax({
   url: "./scoreboard.html",
   data: data,
   success: function(data){
-        console.log(data);
+        handleStatus(data);
 
       },
   error: function(error){
@@ -38,8 +55,8 @@ $.ajax({
 }
 
 window.setInterval(function(){
-  startGame();  //calling every 5 seconds
-}, 5000);
+  getStatus();  //calling every .5 seconds
+}, 500);
 
 
 </script>
@@ -47,7 +64,22 @@ window.setInterval(function(){
 
 </head>
 <body>
- DOBRODOSLI SVI!
-</form>
+<label >Pitanja inicijalizovana:</label>
+<label id="gameCreated">Ne</label>
+<br/>
+<label >Igra spremna:</label>
+<label id="gameReady">Ne</label>
+<br/>
+
+<label >Igra pocela:</label>
+<label id="gameStarted">Ne</label>
+<br/>
+
+<label >Igraca konektovano:</label>
+<label id="playersConnected">0/0</label>
+<br/>
+
+<label >Pitanje:</label>
+<label id="questions">0/0</label>
 </body>
 </html>

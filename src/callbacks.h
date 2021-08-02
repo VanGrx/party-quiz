@@ -13,6 +13,7 @@ public:
   virtual void gameInitCallback(int playerCount) = 0;
   virtual std::vector<std::pair<std::string, unsigned int>> getScores() = 0;
   virtual Question getQuestion() = 0;
+  virtual std::string getGameStatusJSONString() = 0;
 
   // Player callbacks
   virtual void playerEntered(int id, std::string username) = 0;

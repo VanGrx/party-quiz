@@ -208,9 +208,9 @@ void Session::handleScoreboardRequest(
 
     std::string requestString = std::string(req.target());
     size_t pos;
+
     if ((pos = requestString.find('?')) != std::string::npos) {
       requestString = requestString.substr(pos + 1);
-
       parsed_values = parseRequestBody(requestString);
     }
 
@@ -223,19 +223,8 @@ void Session::handleScoreboardRequest(
                                  send);
 
     if (parsed_values["status"] != "") {
-      rapidjson::Document d;
 
-      d.SetObject();
-
-      d.AddMember("igor", "praviIgor", d.GetAllocator());
-
-      rapidjson::StringBuffer buffer;
-      rapidjson::Writer<rapidjson::StringBuffer,
-                        rapidjson::Document::EncodingType, rapidjson::ASCII<>>
-          writer(buffer);
-
-      d.Accept(writer);
-      std::string message = buffer.GetString();
+      std::string message = callbackReceiver->getGameStatusJSONString();
 
       return returnRequestedJSON(message, std::move(req), send);
     }

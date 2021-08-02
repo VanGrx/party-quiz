@@ -38,7 +38,6 @@ public:
 
   int id = 0;
 
-private:
   bool gameStarted = false;
   unsigned int playerNumber;
   unsigned int currQuestion = 0;
