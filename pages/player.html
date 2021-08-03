@@ -3,10 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Grkinho</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
 
-function handlePlayerStatus(data){
+function handlePlayerStatus(status){
 
-  console.log(data);
+
+document.getElementById("playerID").innerHTML = status["player"]["id"];
+document.getElementById("playerUsername").innerHTML = status["player"]["username"];
+
+document.getElementById("score").innerHTML = status["player"]["score"];
+
+
+var currQuestion = status["currQuestion"]+1;
+var questionText = currQuestion+"/"+status["totalQuestions"];
+document.getElementById("questions").innerHTML = questionText;
+
+
+if(status["gameReady"] == true && status["gameStarted"] == false){
+
+
+} else if(status["gameOver"] == false){
+  document.getElementById("pitanjeDiv").style.display = "block";
+  document.getElementById("question").innerHTML = status["question"];
+  document.getElementById("answer1").innerHTML = status["answers"][0];
+  document.getElementById("answer2").innerHTML = status["answers"][1];
+  document.getElementById("answer3").innerHTML = status["answers"][2];
+  document.getElementById("answer4").innerHTML = status["answers"][3];
+
+
+
+} else{
+document.getElementById("pitanjeDiv").style.display = "none";
+
+}
 }
 
 
@@ -14,7 +44,7 @@ function getPlayerStatus(){
 
 var data = {};
 
-data["playerStatus"]="1";
+data["status"]="1";
 
 var res = JSON.stringify(data)
 
@@ -41,10 +71,27 @@ window.setInterval(function(){
   getPlayerStatus();  //calling every .5 seconds
 }, 500);
 
+</script>
+
 
 </head>
 <body>
- PLAYER USAO
+<label >Igracev ID:</label><label id="playerID"></label>
+<label >Igrac:</label><label id="playerUsername"></label>
+<div id="pitanjeDiv" name="pitanjeDiv" style.display = "none">
+
+<label >Pitanje:</label>
+<label id="questions">0/0</label>
+
+<label >Rezultat:</label>
+<label id="score">0</label>
+<br/><br/>
+<label id="question"></label><br/>
+<button id="answer1"></button><br/>
+<button id="answer2"></button><br/>
+<button id="answer3"></button><br/>
+<button id="answer4"></button><br/>
+</div>
 </form>
 </body>
 </html>

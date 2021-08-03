@@ -239,12 +239,14 @@ void Session::handlePlayerRequest(
     int roomNumber = stoi(parsed_values["roomNumber"]);
     std::string username = parsed_values["username"];
 
-    if (!isInit())
+    if (!isInit()) {
+      isPlayer = true;
       generateID();
+    }
 
     bool res = callbackReceiver->playerEntered(roomNumber, id, username);
 
-    if (res)
+    if (!res)
       return send(createErrorResponse(std::move(req), http::status::bad_request,
                                       "Illegal request. No such room!"));
 

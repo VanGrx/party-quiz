@@ -164,6 +164,8 @@ std::string Listener::getPlayerStatusJSONString(int id) {
                          d.GetAllocator());
     playerValue.AddMember("username", usr, d.GetAllocator());
     playerValue.AddMember("score", player.score, d.GetAllocator());
+
+    d.AddMember("player", playerValue, d.GetAllocator());
   }
 
   rapidjson::StringBuffer buffer;
