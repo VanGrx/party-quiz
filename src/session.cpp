@@ -195,8 +195,13 @@ void Session::handlePlayerRequest(
 
     if (parsed_values["status"] != "") {
 
-      // TODO: Check if this is created
       auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
+
+      if (cookieList["sessionID"] == "")
+        return send(createErrorResponse(std::move(req),
+                                        http::status::bad_request,
+                                        "Cookie with session ID not found!"));
+
       int id = stoi(cookieList["sessionID"]);
 
       std::string message = callbackReceiver->getPlayerStatusJSONString(id);
@@ -240,8 +245,6 @@ void Session::handlePlayerRequest(
       int roomNumber = stoi(parsed_values["roomNumber"]);
       std::string username = parsed_values["username"];
 
-      // TODO: playerEntered should return id that will be given to the user to
-      // store it and check
       int playerID = callbackReceiver->playerEntered(roomNumber, username);
 
       if (playerID == 0)
@@ -283,11 +286,20 @@ void Session::handleScoreboardRequest(
 
     if (parsed_values["status"] != "") {
 
-      // TODO: We should use this to select whitch game to check status for
-      // auto cookieList =
-      // parseBasicCookie(std::string(req[http::field::cookie]));
+      auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
+
+      if (cookieList["sessionID"] == "")
+        return send(createErrorResponse(std::move(req),
+                                        http::status::bad_request,
+                                        "Cookie with session ID not found!"));
 
       std::string message = callbackReceiver->getGameStatusJSONString();
+
+      int id = stoi(cookieList["sessionID"]);
+
+      if (callbackReceiver->gameExists(id))
+        return send(createErrorResponse(
+            std::move(req), http::status::bad_request, "Game ID not found!"));
 
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["gameStart"] != "") {
