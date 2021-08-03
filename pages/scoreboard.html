@@ -37,6 +37,7 @@ var createdText = status["gameCreated"] == true ? "DA" : "NE";
 var readyText = status["gameReady"] == true ? "DA" : "NE";
 var startedText = status["gameStarted"] == true ? "DA" : "NE";
 
+document.getElementById("cookieValue").innerHTML=document.cookie;
 
 
 document.getElementById("gameID").innerHTML = status["gameID"];
@@ -128,6 +129,8 @@ function getStatus(){
 
 var data = {};
 
+
+
 data["status"]="1";
 
 var res = JSON.stringify(data)
@@ -156,11 +159,14 @@ window.setInterval(function(){
 }, 500);
 
 
+
 </script>
 
 
 </head>
 <body>
+<label> COOKIE:</label>
+<label id="cookieValue"></label>
 <label >ID igre:</label>
 <label id="gameID">0</label>
 <br/>

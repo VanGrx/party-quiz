@@ -28,6 +28,11 @@ $.ajax({
   url: "./index.html",
   data: data,
   success: function(data){
+
+          var sessionID = data["sessionID"];
+
+          document.cookie = "sessionID="+sessionID;
+
           window.location.href = "."+data["redirect"];
       },
   error: function(error){
