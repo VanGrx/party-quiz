@@ -140,6 +140,17 @@ std::string Listener::getPlayerStatusJSONString(int id) {
   d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
+  Player player = game.getPlayer(id);
+  rapidjson::Value playerValue(rapidjson::kObjectType);
+
+  playerValue.AddMember("id", player.id, d.GetAllocator());
+  rapidjson::Value usr(player.username.c_str(), player.username.size(),
+                       d.GetAllocator());
+  playerValue.AddMember("username", usr, d.GetAllocator());
+  playerValue.AddMember("score", player.score, d.GetAllocator());
+
+  d.AddMember("player", playerValue, d.GetAllocator());
+
   if (game.gameRunning()) {
     Question q = game.giveQuestion();
 
@@ -156,17 +167,6 @@ std::string Listener::getPlayerStatusJSONString(int id) {
     }
 
     d.AddMember("answers", jsonA, d.GetAllocator());
-
-    Player player = game.getPlayer(id);
-    rapidjson::Value playerValue(rapidjson::kObjectType);
-
-    playerValue.AddMember("id", player.id, d.GetAllocator());
-    rapidjson::Value usr(player.username.c_str(), player.username.size(),
-                         d.GetAllocator());
-    playerValue.AddMember("username", usr, d.GetAllocator());
-    playerValue.AddMember("score", player.score, d.GetAllocator());
-
-    d.AddMember("player", playerValue, d.GetAllocator());
   }
 
   rapidjson::StringBuffer buffer;
