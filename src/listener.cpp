@@ -125,6 +125,57 @@ std::string Listener::getGameStatusJSONString() {
   return buffer.GetString();
 }
 
+std::string Listener::getPlayerStatusJSONString(int id) {
+  rapidjson::Document d;
+
+  d.SetObject();
+
+  d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
+  d.AddMember("gameReady", game.gameReady(), d.GetAllocator());
+  d.AddMember("gameStarted", game.gameStarted, d.GetAllocator());
+  d.AddMember("gameOver", !game.gameRunning(), d.GetAllocator());
+  d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
+  d.AddMember("playersEntered", game.players.size(), d.GetAllocator());
+  d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
+  d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
+
+  if (game.gameRunning()) {
+    Question q = game.giveQuestion();
+
+    rapidjson::Value jsonQ(q.question.c_str(), q.question.size(),
+                           d.GetAllocator());
+    d.AddMember("question", jsonQ, d.GetAllocator());
+
+    rapidjson::Value jsonA(rapidjson::kArrayType);
+
+    for (auto &it : q.answers) {
+      rapidjson::Value ans(it.c_str(), it.size(), d.GetAllocator());
+
+      jsonA.PushBack(ans, d.GetAllocator());
+    }
+
+    d.AddMember("answers", jsonA, d.GetAllocator());
+
+    Player player = game.getPlayer(id);
+    rapidjson::Value playerValue(rapidjson::kObjectType);
+
+    playerValue.AddMember("id", player.id, d.GetAllocator());
+    rapidjson::Value usr(player.username.c_str(), player.username.size(),
+                         d.GetAllocator());
+    playerValue.AddMember("username", usr, d.GetAllocator());
+    playerValue.AddMember("score", player.score, d.GetAllocator());
+  }
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType,
+                    rapidjson::ASCII<>>
+      writer(buffer);
+
+  d.Accept(writer);
+
+  return buffer.GetString();
+}
+
 std::string Listener::getScoresJSONString() {
   rapidjson::Document d;
 

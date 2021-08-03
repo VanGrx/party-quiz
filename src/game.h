@@ -31,6 +31,8 @@ public:
   std::vector<std::pair<std::string, unsigned int>> getScores();
   void playerAnswered(int id, int answerGiven);
 
+  Player getPlayer(int id);
+
   void print();
 
   void startGame();

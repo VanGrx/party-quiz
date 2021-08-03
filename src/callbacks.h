@@ -14,6 +14,7 @@ public:
   virtual std::vector<std::pair<std::string, unsigned int>> getScores() = 0;
   virtual Question getQuestion() = 0;
   virtual std::string getGameStatusJSONString() = 0;
+  virtual std::string getPlayerStatusJSONString(int id) = 0;
   virtual void startGame() = 0;
   virtual std::string getScoresJSONString() = 0;
 

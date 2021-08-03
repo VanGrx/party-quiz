@@ -214,6 +214,13 @@ void Session::handlePlayerRequest(
     if (parsed_values.empty())
       return returnRequestedPage(path_cat(doc_root, req.target()),
                                  std::move(req), send);
+
+    if (parsed_values["status"] != "") {
+
+      std::string message = callbackReceiver->getPlayerStatusJSONString(id);
+
+      return returnRequestedJSON(message, std::move(req), send);
+    }
   }
 
   // Respond to POST request
@@ -223,8 +230,10 @@ void Session::handlePlayerRequest(
     std::map<std::string, std::string> parsed_values =
         parseRequestBody(req.body());
 
-    if (parsed_values.size() != 2) {
-      // TODO : Error
+    if (parsed_values.size() != 2 || parsed_values["roomNumber"] == "" ||
+        parsed_values["username"] == "") {
+      return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                      "Bad params given!"));
     }
 
     int roomNumber = stoi(parsed_values["roomNumber"]);
@@ -294,19 +303,16 @@ void Session::handleScoreboardRequest(
     std::map<std::string, std::string> parsed_values =
         parseRequestBody(req.body());
 
-    if (parsed_values.size() != 1) {
-      // TODO : Error
+    // Only 1 value is needed: numberOfPlayers
+    if (parsed_values.size() != 1 || parsed_values["numberOfPlayers"] == "") {
+      return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                      "Multiple params given!"));
     }
 
     int playerNumber = stoi(parsed_values["numberOfPlayers"]);
 
     if (!isInit())
       generateID();
-
-    actorMutex.lock();
-    actor = std::static_pointer_cast<Actor>(
-        std::make_shared<Referee>(playerNumber));
-    actorMutex.unlock();
 
     callbackReceiver->gameInitCallback(id, playerNumber);
 

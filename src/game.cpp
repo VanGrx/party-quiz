@@ -60,6 +60,15 @@ std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   return scores;
 }
 
+Player Game::getPlayer(int id) {
+
+  auto it = find_if(players.begin(), players.end(),
+                    [&id](const Player &p) { return p.id == id; });
+  if (it != players.end())
+    return *it;
+  return Player();
+}
+
 void Game::playerAnswered(int id, int answerGiven) {
 
   auto player =
