@@ -49,6 +49,8 @@ public:
 
   virtual std::string getScoresJSONString() override;
 
+  virtual bool gameExists(int id) override;
+
   // Player callbacks
   virtual int playerEntered(int roomID, std::string username) override;
   virtual void answerGiven(int id, int answerGiven) override;

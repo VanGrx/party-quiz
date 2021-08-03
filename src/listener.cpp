@@ -82,6 +82,8 @@ void Listener::startGame() {
     game.startGame();
 }
 
+bool Listener::gameExists(int id) { return game.id == id; }
+
 std::string Listener::getGameStatusJSONString() {
   rapidjson::Document d;
 

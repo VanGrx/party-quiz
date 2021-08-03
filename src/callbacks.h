@@ -1,6 +1,7 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
+#include "game.h"
 #include "question.h"
 #include <iostream>
 #include <string>
@@ -17,6 +18,7 @@ public:
   virtual std::string getPlayerStatusJSONString(int id) = 0;
   virtual void startGame() = 0;
   virtual std::string getScoresJSONString() = 0;
+  virtual bool gameExists(int id) = 0;
 
   // Player callbacks
   virtual int playerEntered(int roomID, std::string username) = 0;
