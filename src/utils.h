@@ -28,6 +28,7 @@ std::string curlCollect(std::string url);
 
 std::map<std::string, std::string> parseRequestTarget(const std::string &data);
 std::map<std::string, std::string> parseRequestBody(const std::string &data);
+std::map<std::string, std::string> parseBasicCookie(const std::string &data);
 
 static const std::string b =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; //=

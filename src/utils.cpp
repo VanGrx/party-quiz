@@ -164,3 +164,49 @@ std::map<std::string, std::string> parseRequestBody(const std::string &data) {
     parsed_values.insert(std::make_pair(name, value));
   return parsed_values;
 }
+
+std::map<std::string, std::string> parseBasicCookie(const std::string &data) {
+  enum class States { Name, Ignore, Value, WhiteSpace };
+
+  std::map<std::string, std::string> parsed_values;
+  std::string name;
+  std::string value;
+
+  States state = States::Name;
+  for (char c : data) {
+
+    switch (state) {
+    case States::Name:
+      if (c != '=') {
+        name += c;
+      } else {
+        state = States::Ignore;
+      }
+      break;
+    case States::Ignore:
+      if (c != '=') {
+        state = States::Value;
+        value += c;
+      }
+      break;
+    case States::Value:
+      if (c != ';') {
+        value += c;
+      } else {
+        parsed_values.insert(std::make_pair(name, value));
+        name = "";
+        value = "";
+        state = States::WhiteSpace;
+      }
+      break;
+    case States::WhiteSpace:
+      if (c != ' ') {
+        state = States::Name;
+      }
+      break;
+    }
+  }
+  if (value != "")
+    parsed_values.insert(std::make_pair(name, value));
+  return parsed_values;
+}
