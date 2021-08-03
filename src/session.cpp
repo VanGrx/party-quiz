@@ -195,12 +195,9 @@ void Session::handlePlayerRequest(
 
     if (parsed_values["status"] != "") {
 
-      for (auto param : http::param_list(req[http::field::cookie]))
-        std::cout << "Cookie '" << param.first << "' has value '"
-                  << param.second << "'\n";
-
       // TODO: Check if this is created
-      int id = stoi(parsed_values["id"]);
+      auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
+      int id = stoi(cookieList["sessionID"]);
 
       std::string message = callbackReceiver->getPlayerStatusJSONString(id);
 
@@ -227,13 +224,19 @@ void Session::handlePlayerRequest(
     }
 
     if (isPlayerAnswerGiven) {
-      int playerID = stoi(parsed_values["playerID"]);
+
       int answer = stoi(parsed_values["answer"]);
 
-      callbackReceiver->answerGiven(playerID, answer);
-    }
+      auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
 
-    if (isPlayerEnter) {
+      int playerID = stoi(cookieList["sessionID"]);
+
+      callbackReceiver->answerGiven(playerID, answer);
+
+      std::string message = "status:'OK'";
+      return returnRequestedJSON(message, std::move(req), send);
+
+    } else if (isPlayerEnter) {
       int roomNumber = stoi(parsed_values["roomNumber"]);
       std::string username = parsed_values["username"];
 
@@ -249,6 +252,9 @@ void Session::handlePlayerRequest(
       std::string message = createPageRedirect(playerID, pages::playerPage);
 
       return returnRequestedJSON(message, std::move(req), send);
+    } else {
+      return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                      "Bad params given!"));
     }
   }
 }
@@ -270,17 +276,16 @@ void Session::handleScoreboardRequest(
     std::string target = std::string(req.target());
     if (target == "/")
       target = pages::initPage;
+
     if (parsed_values.empty())
       return returnRequestedPage(path_cat(doc_root, target), std::move(req),
                                  send);
 
     if (parsed_values["status"] != "") {
 
-      auto list = http::param_list(req[http::field::cookie]);
-
-      for (auto param : list)
-        std::cout << "Cookie '" << param.first << "' has value '"
-                  << param.second << "'\n";
+      // TODO: We should use this to select whitch game to check status for
+      // auto cookieList =
+      // parseBasicCookie(std::string(req[http::field::cookie]));
 
       std::string message = callbackReceiver->getGameStatusJSONString();
 
