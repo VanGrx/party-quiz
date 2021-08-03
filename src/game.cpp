@@ -6,17 +6,16 @@
 #include <rapidjson/writer.h>
 #include <thread>
 
-Game::Game() {}
+Game::Game() : rand(MAX_ID) {}
 
-Game::Game(unsigned int _playerNumber) : playerNumber{_playerNumber} {}
-
-void Game::createGame(int _id, unsigned int _playerNumber) {
+int Game::createGame(unsigned int _playerNumber) {
   clearGame();
   playerNumber = _playerNumber;
-  id = _id;
+  id = rand.getNextRandom();
   if (questionCacheThread.joinable())
     questionCacheThread.join();
   questionCacheThread = std::thread(&Game::getQuestions, this);
+  return id;
 }
 
 void Game::clearGame() {
@@ -30,10 +29,17 @@ void Game::clearGame() {
 
 bool Game::gameReady() { return players.size() == playerNumber; }
 
-bool Game::addPlayer(int id, std::string name) {
+int Game::addPlayer(std::string name) {
+
+  int id = rand.getNextRandom();
+  while (find_if(players.begin(), players.end(), [&id](const Player &p) {
+           return id == p.id;
+         }) != players.end())
+    id = rand.getNextRandom();
+
   players.emplace_back(id, name);
 
-  return true;
+  return id;
 }
 
 Question Game::giveQuestion() { return questions[currQuestion]; }

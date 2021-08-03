@@ -39,7 +39,7 @@ class Listener : public std::enable_shared_from_this<Listener>,
 
 public:
   // Scoreboard callback
-  virtual void gameInitCallback(int id, int playerCount) override;
+  virtual int gameInitCallback(int playerCount) override;
   virtual std::vector<std::pair<std::string, unsigned int>>
   getScores() override;
   virtual Question getQuestion() override;
@@ -50,7 +50,7 @@ public:
   virtual std::string getScoresJSONString() override;
 
   // Player callbacks
-  virtual bool playerEntered(int roomID, int id, std::string username) override;
+  virtual int playerEntered(int roomID, std::string username) override;
   virtual void answerGiven(int id, int answerGiven) override;
 
   Listener(net::io_context &ioc, tcp::endpoint endpoint,

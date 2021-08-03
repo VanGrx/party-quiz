@@ -65,8 +65,9 @@ void Listener::on_accept(beast::error_code ec, tcp::socket socket) {
 //////////////////////////////////////////////////////////////////////////
 /// Callbacks
 
-void Listener::gameInitCallback(int id, int playerCount) {
-  game.createGame(id, playerCount);
+int Listener::gameInitCallback(int playerCount) {
+
+  return game.createGame(playerCount);
 }
 
 std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
@@ -211,12 +212,11 @@ std::string Listener::getScoresJSONString() {
 }
 
 // Player callbacks
-bool Listener::playerEntered(int roomID, int id, std::string username) {
+int Listener::playerEntered(int roomID, std::string username) {
 
   if (game.id != roomID)
     return false;
-  game.addPlayer(id, username);
-  return true;
+  return game.addPlayer(username);
 }
 
 void Listener::answerGiven(int id, int answerGiven) {

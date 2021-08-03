@@ -8,22 +8,23 @@
 
 #include "player.h"
 #include "question.h"
+#include "randomgenerator.h"
 
 class Game {
 public:
   Game();
 
-  Game(unsigned int _playerNumber);
+  RandomGenerator rand;
 
   std::vector<Question> questions;
   std::vector<Player> players;
 
-  void createGame(int _id, unsigned int _playerNumber);
+  int createGame(unsigned int _playerNumber);
   void clearGame();
 
   void getQuestions();
   bool gameReady();
-  bool addPlayer(int id, std::string name);
+  int addPlayer(std::string name);
   Question giveQuestion();
   bool nextRound();
   bool gameFinished();

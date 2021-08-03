@@ -69,14 +69,6 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::shared_ptr<CallbackListener> callbackReceiver;
 
-  bool gameReady = false;
-  bool isPlayer = false;
-  unsigned int id = 0;
-
-  // Actor fields
-  std::mutex actorMutex;
-  std::shared_ptr<Actor> actor;
-
 public:
   // Take ownership of the stream
   Session(tcp::socket &&socket,
@@ -101,8 +93,6 @@ public:
   void do_close();
 
   void generateID();
-
-  bool isInit();
 
   std::string createPageRedirect(const std::string &page);
 

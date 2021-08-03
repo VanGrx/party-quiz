@@ -119,10 +119,6 @@ http::status Session::parseBodyFromFile(const std::string path,
 
 //-------------------------------------------------------------------------------------------------
 
-bool Session::isInit() { return id != 0; }
-
-//-------------------------------------------------------------------------------------------------
-
 std::string Session::createPageRedirect(const std::string &page) {
   rapidjson::Document d;
 
@@ -139,14 +135,6 @@ std::string Session::createPageRedirect(const std::string &page) {
 
   d.Accept(writer);
   return buffer.GetString();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void Session::generateID() {
-
-  srand(time(NULL));
-  id = rand() % MAX_ID + 1;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -174,11 +162,6 @@ void Session::handle_request(
        targetResource == pages::scoreboardPage);
   const bool isPlayerRequest = (targetResource == pages::playerInitPage ||
                                 targetResource == pages::playerPage);
-
-  // TODO: Kick the cheater?
-  if (isInit() && (isPlayer != isPlayerRequest))
-    return send(createErrorResponse(std::move(req), http::status::bad_request,
-                                    "Illegal request...cheater!"));
 
   // Player called
   if (isPlayerRequest) {
@@ -217,6 +200,9 @@ void Session::handlePlayerRequest(
 
     if (parsed_values["status"] != "") {
 
+      // TODO: Check if this is created
+      int id = stoi(parsed_values["id"]);
+
       std::string message = callbackReceiver->getPlayerStatusJSONString(id);
 
       return returnRequestedJSON(message, std::move(req), send);
@@ -252,12 +238,9 @@ void Session::handlePlayerRequest(
       int roomNumber = stoi(parsed_values["roomNumber"]);
       std::string username = parsed_values["username"];
 
-      if (!isInit()) {
-        isPlayer = true;
-        generateID();
-      }
-
-      bool res = callbackReceiver->playerEntered(roomNumber, id, username);
+      // TODO: playerEntered should return id that will be given to the user to
+      // store it and check
+      bool res = callbackReceiver->playerEntered(roomNumber, username);
 
       if (!res)
         return send(createErrorResponse(std::move(req),
@@ -328,10 +311,9 @@ void Session::handleScoreboardRequest(
 
     int playerNumber = stoi(parsed_values["numberOfPlayers"]);
 
-    if (!isInit())
-      generateID();
-
-    callbackReceiver->gameInitCallback(id, playerNumber);
+    int gameID = callbackReceiver->gameInitCallback(playerNumber);
+    // TODO: remove this when id is prepared
+    std::cout << gameID << std::endl;
 
     std::string message = createPageRedirect(pages::scoreboardPage);
 
