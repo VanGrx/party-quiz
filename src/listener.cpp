@@ -184,17 +184,17 @@ std::string Listener::getScoresJSONString() {
   d.SetArray();
 
   if (game.gameStarted) {
-    auto results = game.getScores();
+    auto players = game.players;
 
-    for (auto result : results) {
+    for (auto &player : players) {
       rapidjson::Value res(rapidjson::kObjectType);
 
-      res.AddMember("id", 0, d.GetAllocator());
+      res.AddMember("id", player.id, d.GetAllocator());
 
-      rapidjson::Value username(result.first.c_str(), result.first.size(),
+      rapidjson::Value username(player.username.c_str(), player.username.size(),
                                 d.GetAllocator());
       res.AddMember("username", username, d.GetAllocator());
-      res.AddMember("score", result.second, d.GetAllocator());
+      res.AddMember("score", player.score, d.GetAllocator());
 
       d.PushBack(res, d.GetAllocator());
     }
@@ -220,5 +220,5 @@ bool Listener::playerEntered(int roomID, int id, std::string username) {
 }
 
 void Listener::answerGiven(int id, int answerGiven) {
-  std::cout << "player entered" << id << " " << answerGiven;
+  game.playerAnswered(id, answerGiven);
 }

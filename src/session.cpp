@@ -230,29 +230,44 @@ void Session::handlePlayerRequest(
     std::map<std::string, std::string> parsed_values =
         parseRequestBody(req.body());
 
-    if (parsed_values.size() != 2 || parsed_values["roomNumber"] == "" ||
-        parsed_values["username"] == "") {
+    bool isValid = parsed_values.size() == 2;
+    bool isPlayerEnter =
+        parsed_values["roomNumber"] != "" && parsed_values["username"] != "";
+    bool isPlayerAnswerGiven =
+        parsed_values["answer"] != "" && parsed_values["playerID"] != "";
+
+    if (!isValid || (!isPlayerEnter && !isPlayerAnswerGiven)) {
       return send(createErrorResponse(std::move(req), http::status::bad_request,
                                       "Bad params given!"));
     }
 
-    int roomNumber = stoi(parsed_values["roomNumber"]);
-    std::string username = parsed_values["username"];
+    if (isPlayerAnswerGiven) {
+      int playerID = stoi(parsed_values["playerID"]);
+      int answer = stoi(parsed_values["answer"]);
 
-    if (!isInit()) {
-      isPlayer = true;
-      generateID();
+      callbackReceiver->answerGiven(playerID, answer);
     }
 
-    bool res = callbackReceiver->playerEntered(roomNumber, id, username);
+    if (isPlayerEnter) {
+      int roomNumber = stoi(parsed_values["roomNumber"]);
+      std::string username = parsed_values["username"];
 
-    if (!res)
-      return send(createErrorResponse(std::move(req), http::status::bad_request,
-                                      "Illegal request. No such room!"));
+      if (!isInit()) {
+        isPlayer = true;
+        generateID();
+      }
 
-    std::string message = createPageRedirect(pages::playerPage);
+      bool res = callbackReceiver->playerEntered(roomNumber, id, username);
 
-    return returnRequestedJSON(message, std::move(req), send);
+      if (!res)
+        return send(createErrorResponse(std::move(req),
+                                        http::status::bad_request,
+                                        "Illegal request. No such room!"));
+
+      std::string message = createPageRedirect(pages::playerPage);
+
+      return returnRequestedJSON(message, std::move(req), send);
+    }
   }
 }
 
