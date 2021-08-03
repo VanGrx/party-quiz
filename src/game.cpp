@@ -151,7 +151,7 @@ void Game::playGame() {
   using namespace std::chrono_literals;
 
   while (!gameFinished()) {
-    std::this_thread::sleep_for(2s);
+    std::this_thread::sleep_for(20s);
 
     nextRound();
   }
