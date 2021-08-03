@@ -104,6 +104,8 @@ public:
 
   bool isInit();
 
+  std::string createPageRedirect(const std::string &page);
+
   template <class Body, class Allocator>
   bool checkRequest(http::request<Body, http::basic_fields<Allocator>> &req);
 

@@ -123,6 +123,26 @@ bool Session::isInit() { return id != 0; }
 
 //-------------------------------------------------------------------------------------------------
 
+std::string Session::createPageRedirect(const std::string &page) {
+  rapidjson::Document d;
+
+  d.SetObject();
+
+  rapidjson::Value jsonPage(page.c_str(), page.size(), d.GetAllocator());
+
+  d.AddMember("redirect", jsonPage, d.GetAllocator());
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType,
+                    rapidjson::ASCII<>>
+      writer(buffer);
+
+  d.Accept(writer);
+  return buffer.GetString();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void Session::generateID() {
 
   srand(time(NULL));
@@ -219,19 +239,7 @@ void Session::handlePlayerRequest(
       return send(createErrorResponse(std::move(req), http::status::bad_request,
                                       "Illegal request. No such room!"));
 
-    rapidjson::Document d;
-
-    d.SetObject();
-
-    d.AddMember("igor", "/player.html", d.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer,
-                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
-        writer(buffer);
-
-    d.Accept(writer);
-    std::string message = buffer.GetString();
+    std::string message = createPageRedirect(pages::playerPage);
 
     return returnRequestedJSON(message, std::move(req), send);
   }
@@ -302,19 +310,7 @@ void Session::handleScoreboardRequest(
 
     callbackReceiver->gameInitCallback(id, playerNumber);
 
-    rapidjson::Document d;
-
-    d.SetObject();
-
-    d.AddMember("igor", "/scoreboard.html", d.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer,
-                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
-        writer(buffer);
-
-    d.Accept(writer);
-    std::string message = buffer.GetString();
+    std::string message = createPageRedirect(pages::scoreboardPage);
 
     return returnRequestedJSON(message, std::move(req), send);
   }
