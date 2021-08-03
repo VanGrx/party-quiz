@@ -119,13 +119,14 @@ http::status Session::parseBodyFromFile(const std::string path,
 
 //-------------------------------------------------------------------------------------------------
 
-std::string Session::createPageRedirect(const std::string &page) {
+std::string Session::createPageRedirect(const int ID, const std::string &page) {
   rapidjson::Document d;
 
   d.SetObject();
 
   rapidjson::Value jsonPage(page.c_str(), page.size(), d.GetAllocator());
 
+  d.AddMember("sessionID", ID, d.GetAllocator());
   d.AddMember("redirect", jsonPage, d.GetAllocator());
 
   rapidjson::StringBuffer buffer;
@@ -184,21 +185,19 @@ void Session::handlePlayerRequest(
   if (req.method() == http::verb::get) {
 
     // Parse the values given
-    std::map<std::string, std::string> parsed_values;
+    std::map<std::string, std::string> parsed_values =
+        parseRequestTarget(std::string(req.target()));
 
-    std::string requestString = std::string(req.target());
-    size_t pos;
-
-    if ((pos = requestString.find('?')) != std::string::npos) {
-      requestString = requestString.substr(pos + 1);
-      parsed_values = parseRequestBody(requestString);
-    }
     // Just give the page if no params are given
     if (parsed_values.empty())
       return returnRequestedPage(path_cat(doc_root, req.target()),
                                  std::move(req), send);
 
     if (parsed_values["status"] != "") {
+
+      for (auto param : http::param_list(req[http::field::cookie]))
+        std::cout << "Cookie '" << param.first << "' has value '"
+                  << param.second << "'\n";
 
       // TODO: Check if this is created
       int id = stoi(parsed_values["id"]);
@@ -240,14 +239,14 @@ void Session::handlePlayerRequest(
 
       // TODO: playerEntered should return id that will be given to the user to
       // store it and check
-      bool res = callbackReceiver->playerEntered(roomNumber, username);
+      int playerID = callbackReceiver->playerEntered(roomNumber, username);
 
-      if (!res)
+      if (playerID == 0)
         return send(createErrorResponse(std::move(req),
                                         http::status::bad_request,
                                         "Illegal request. No such room!"));
 
-      std::string message = createPageRedirect(pages::playerPage);
+      std::string message = createPageRedirect(playerID, pages::playerPage);
 
       return returnRequestedJSON(message, std::move(req), send);
     }
@@ -264,15 +263,8 @@ void Session::handleScoreboardRequest(
   if (req.method() == http::verb::get) {
 
     // Parse the values given
-    std::map<std::string, std::string> parsed_values;
-
-    std::string requestString = std::string(req.target());
-    size_t pos;
-
-    if ((pos = requestString.find('?')) != std::string::npos) {
-      requestString = requestString.substr(pos + 1);
-      parsed_values = parseRequestBody(requestString);
-    }
+    std::map<std::string, std::string> parsed_values =
+        parseRequestTarget(std::string(req.target()));
 
     // Just give the page if no params are given
     std::string target = std::string(req.target());
@@ -283,6 +275,12 @@ void Session::handleScoreboardRequest(
                                  send);
 
     if (parsed_values["status"] != "") {
+
+      auto list = http::param_list(req[http::field::cookie]);
+
+      for (auto param : list)
+        std::cout << "Cookie '" << param.first << "' has value '"
+                  << param.second << "'\n";
 
       std::string message = callbackReceiver->getGameStatusJSONString();
 
@@ -312,10 +310,8 @@ void Session::handleScoreboardRequest(
     int playerNumber = stoi(parsed_values["numberOfPlayers"]);
 
     int gameID = callbackReceiver->gameInitCallback(playerNumber);
-    // TODO: remove this when id is prepared
-    std::cout << gameID << std::endl;
 
-    std::string message = createPageRedirect(pages::scoreboardPage);
+    std::string message = createPageRedirect(gameID, pages::scoreboardPage);
 
     return returnRequestedJSON(message, std::move(req), send);
   }

@@ -94,7 +94,7 @@ public:
 
   void generateID();
 
-  std::string createPageRedirect(const std::string &page);
+  std::string createPageRedirect(const int ID, const std::string &page);
 
   template <class Body, class Allocator>
   bool checkRequest(http::request<Body, http::basic_fields<Allocator>> &req);
