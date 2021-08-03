@@ -215,7 +215,7 @@ std::string Listener::getScoresJSONString() {
 int Listener::playerEntered(int roomID, std::string username) {
 
   if (game.id != roomID)
-    return false;
+    return 0;
   return game.addPlayer(username);
 }
 
