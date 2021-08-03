@@ -187,6 +187,10 @@ std::string Listener::getScoresJSONString() {
   if (game.gameStarted) {
     auto players = game.players;
 
+    sort(
+        players.begin(), players.end(),
+        [](const Player &p1, const Player &p2) { return p1.score > p2.score; });
+
     for (auto &player : players) {
       rapidjson::Value res(rapidjson::kObjectType);
 
