@@ -15,7 +15,7 @@ function handleScores(scores){
 document.getElementById("scoresDiv").style.display = "block";
 
 
-<!--document.getElementById("scoresDiv").empty();-->
+document.getElementById("scoresDiv").innerHTML="";
 
 for(i in scores){
 $( '<div id="playerScore">'+scores[i]["id"]+' '+scores[i]["username"]+' '+scores[i]["score"]+'</div>' ).appendTo("#scoresDiv");
