@@ -49,9 +49,11 @@ bool Game::nextRound() {
   return true;
 }
 
-bool Game::gameFinished() { return currQuestion == questions.size(); }
+bool Game::gameFinished() { return state == GAME_FINISHED; }
 
 bool Game::gameRunning() { return state == GAME_PLAYING; }
+
+bool Game::gamePaused() { return state == GAME_PAUSED; }
 
 std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   std::vector<std::pair<std::string, unsigned int>> scores;
@@ -112,18 +114,20 @@ void Game::startGame() {
 
 void Game::playGame() {
 
-  while (!gameFinished()) {
+  while (currQuestion < questions.size()) {
 
-    // TODO: Add logic for people to read correct answer and give results of the
-    // round
+    state = GAME_PLAYING;
+    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
+
     state = GAME_PAUSED;
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
+    // TODO: Add logic for people to read correct answer and give results of the
+    // round
+
     // TODO: Add mutex logic so there is no possibility to read next question
     // results
-    state = GAME_PLAYING;
-    nextRound();
 
-    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
+    nextRound();
   }
 
   state = GAME_FINISHED;

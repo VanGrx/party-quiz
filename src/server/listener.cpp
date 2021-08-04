@@ -78,7 +78,7 @@ std::vector<std::pair<std::string, unsigned int>> Listener::getScores() {
 Question Listener::getQuestion() { return game.giveQuestion(); }
 
 void Listener::startGame() {
-  if (game.gameCreated && game.gameReady() && !game.gameStarted)
+  if (game.gameReady())
     game.startGame();
 }
 
@@ -91,16 +91,13 @@ std::string Listener::getGameStatusJSONString() {
 
   d.AddMember("gameID", game.id, d.GetAllocator());
 
-  d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
-  d.AddMember("gameReady", game.gameReady(), d.GetAllocator());
-  d.AddMember("gameStarted", game.gameStarted, d.GetAllocator());
-  d.AddMember("gameOver", !game.gameRunning(), d.GetAllocator());
+  d.AddMember("gameState", game.state, d.GetAllocator());
   d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
   d.AddMember("playersEntered", game.players.size(), d.GetAllocator());
   d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
-  if (game.gameRunning()) {
+  if (game.gameRunning() || game.gamePaused()) {
     Question q = game.giveQuestion();
 
     rapidjson::Value jsonQ(q.question.c_str(), q.question.size(),
@@ -116,6 +113,10 @@ std::string Listener::getGameStatusJSONString() {
     }
 
     d.AddMember("answers", jsonA, d.GetAllocator());
+
+    if (game.gamePaused()) {
+      d.AddMember("correctAnswer", q.correctAnswerIndex, d.GetAllocator());
+    }
   }
 
   rapidjson::StringBuffer buffer;
@@ -133,10 +134,7 @@ std::string Listener::getPlayerStatusJSONString(int id) {
 
   d.SetObject();
 
-  d.AddMember("gameCreated", game.gameCreated, d.GetAllocator());
-  d.AddMember("gameReady", game.gameReady(), d.GetAllocator());
-  d.AddMember("gameStarted", game.gameStarted, d.GetAllocator());
-  d.AddMember("gameOver", !game.gameRunning(), d.GetAllocator());
+  d.AddMember("gameState", game.state, d.GetAllocator());
   d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
   d.AddMember("playersEntered", game.players.size(), d.GetAllocator());
   d.AddMember("totalQuestions", game.questions.size(), d.GetAllocator());
@@ -186,25 +184,22 @@ std::string Listener::getScoresJSONString() {
 
   d.SetArray();
 
-  if (game.gameStarted) {
-    auto players = game.players;
+  auto players = game.players;
 
-    sort(
-        players.begin(), players.end(),
-        [](const Player &p1, const Player &p2) { return p1.score > p2.score; });
+  sort(players.begin(), players.end(),
+       [](const Player &p1, const Player &p2) { return p1.score > p2.score; });
 
-    for (auto &player : players) {
-      rapidjson::Value res(rapidjson::kObjectType);
+  for (auto &player : players) {
+    rapidjson::Value res(rapidjson::kObjectType);
 
-      res.AddMember("id", player.id, d.GetAllocator());
+    res.AddMember("id", player.id, d.GetAllocator());
 
-      rapidjson::Value username(player.username.c_str(), player.username.size(),
-                                d.GetAllocator());
-      res.AddMember("username", username, d.GetAllocator());
-      res.AddMember("score", player.score, d.GetAllocator());
+    rapidjson::Value username(player.username.c_str(), player.username.size(),
+                              d.GetAllocator());
+    res.AddMember("username", username, d.GetAllocator());
+    res.AddMember("score", player.score, d.GetAllocator());
 
-      d.PushBack(res, d.GetAllocator());
-    }
+    d.PushBack(res, d.GetAllocator());
   }
 
   rapidjson::StringBuffer buffer;
