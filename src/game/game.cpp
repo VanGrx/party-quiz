@@ -55,6 +55,16 @@ bool Game::gameRunning() { return state == GAME_PLAYING; }
 
 bool Game::gamePaused() { return state == GAME_PAUSED; }
 
+bool Game::allPlayersAnswered() {
+
+  unsigned int currenQuestion = currQuestion;
+
+  return std::all_of(players.begin(), players.end(),
+                     [&currenQuestion](const Player &player) {
+                       return player.questionsAnswered >= currenQuestion;
+                     });
+}
+
 std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   std::vector<std::pair<std::string, unsigned int>> scores;
 
@@ -117,8 +127,13 @@ void Game::playGame() {
   while (currQuestion < questions.size()) {
 
     state = GAME_PLAYING;
-    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
 
+    unsigned timePassed = 0;
+
+    while (timePassed < ROUND_TIME && !allPlayersAnswered()) {
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      timePassed++;
+    }
     state = GAME_PAUSED;
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
     // TODO: Add logic for people to read correct answer and give results of the

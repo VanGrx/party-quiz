@@ -33,6 +33,7 @@ public:
   bool gameFinished();
   bool gameRunning();
   bool gamePaused();
+  bool allPlayersAnswered();
   std::vector<std::pair<std::string, unsigned int>> getScores();
   void playerAnswered(int id, int answerGiven);
 
