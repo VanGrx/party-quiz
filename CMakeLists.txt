@@ -25,8 +25,6 @@ set(include_files
     src/game.h
     src/question.h
     src/player.h
-    src/actor.h
-    src/referee.h
     src/callbacks.h
     src/randomgenerator.h
     )
@@ -40,7 +38,6 @@ set(source_files
     src/game.cpp
     src/question.cpp
     src/player.cpp
-    src/referee.cpp
     src/randomgenerator.cpp
     )
 

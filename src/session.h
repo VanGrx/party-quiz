@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-#include "actor.h"
 #include "callbacks.h"
 #include "pages.h"
 #include "player.h"

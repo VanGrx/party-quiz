@@ -1,6 +1,5 @@
 #include "session.h"
 #include "pages.h"
-#include "referee.h"
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
