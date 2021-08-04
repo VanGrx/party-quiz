@@ -296,13 +296,16 @@ void Session::handleScoreboardRequest(
 
       int id = stoi(cookieList["sessionID"]);
 
-      if (callbackReceiver->gameExists(id))
+      if (!callbackReceiver->gameExists(id))
         return send(createErrorResponse(
             std::move(req), http::status::bad_request, "Game ID not found!"));
 
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["gameStart"] != "") {
+      // TODO: Create normal answer or generic one
       callbackReceiver->startGame();
+      std::string message = "'name':'example'";
+      return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["scores"] != "") {
       std::string message = callbackReceiver->getScoresJSONString();
 
