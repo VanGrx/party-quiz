@@ -1,5 +1,5 @@
 #include "player.h"
-#include "utils.h"
+#include "gameconfig.h"
 
 Player::Player() {}
 

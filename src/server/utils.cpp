@@ -1,5 +1,3 @@
-#include <curl/curl.h>
-
 #include "utils.h"
 
 void fail(beast::error_code ec, char const *what) {
@@ -81,33 +79,6 @@ beast::string_view mime_type(beast::string_view path) {
   if (iequals(ext, ".svgz"))
     return "image/svg+xml";
   return "application/text";
-}
-
-static size_t WriteCallback(void *contents, size_t size, size_t nmemb,
-                            void *userp) {
-  ((std::string *)userp)->append((char *)contents, size * nmemb);
-  return size * nmemb;
-}
-
-std::string curlCollect(std::string url) {
-  CURL *curl;
-  CURLcode res;
-  std::string readBuffer = "";
-
-  curl = curl_easy_init();
-  if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
-    res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
-
-    if (res != CURLcode::CURLE_OK)
-      return "";
-  }
-  return readBuffer;
 }
 
 std::map<std::string, std::string> parseRequestTarget(const std::string &data) {
