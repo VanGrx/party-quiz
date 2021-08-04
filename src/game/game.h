@@ -14,10 +14,13 @@ class Game {
 public:
   Game();
 
-  RandomGenerator rand;
-
-  std::vector<Question> questions;
-  std::vector<Player> players;
+  enum GameState {
+    GAME_NULL = 0,
+    GAME_CREATED,
+    GAME_PLAYING,
+    GAME_PAUSED,
+    GAME_FINISHED
+  };
 
   int createGame(unsigned int _playerNumber);
   void clearGame();
@@ -36,18 +39,25 @@ public:
 
   void print();
 
+  // Thread start and thread run functions
   void startGame();
   void playGame();
 
-  std::mutex gameMutex;
-  bool gameCreated = false;
   std::thread questionCacheThread;
   std::thread gamePlayingThread;
 
+  RandomGenerator rand;
+
+  std::vector<Question> questions;
+  std::vector<Player> players;
+
+  std::mutex gameMutex;
+
   int id = 0;
 
-  bool gameStarted = false;
-  unsigned int playerNumber;
+  GameState state = GAME_NULL;
+
+  unsigned int playerNumber = 0;
   unsigned int currQuestion = 0;
 };
 

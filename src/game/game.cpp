@@ -22,11 +22,12 @@ void Game::clearGame() {
   players.clear();
   currQuestion = 0;
   id = 0;
-  gameCreated = false;
-  gameStarted = false;
+  state = GAME_NULL;
 }
 
-bool Game::gameReady() { return players.size() == playerNumber; }
+bool Game::gameReady() {
+  return GAME_CREATED && players.size() > 0 && players.size() == playerNumber;
+}
 
 int Game::addPlayer(std::string name) {
 
@@ -50,7 +51,7 @@ bool Game::nextRound() {
 
 bool Game::gameFinished() { return currQuestion == questions.size(); }
 
-bool Game::gameRunning() { return gameStarted && !gameFinished(); }
+bool Game::gameRunning() { return state == GAME_PLAYING; }
 
 std::vector<std::pair<std::string, unsigned int>> Game::getScores() {
   std::vector<std::pair<std::string, unsigned int>> scores;
@@ -98,7 +99,7 @@ void Game::getQuestions() {
 
   // We set that everything is OK and game is created
   gameMutex.lock();
-  gameCreated = true;
+  state = GAME_CREATED;
   std::cout << "GAME CREATED" << std::endl;
   gameMutex.unlock();
 }
@@ -111,20 +112,21 @@ void Game::startGame() {
 
 void Game::playGame() {
 
-  gameStarted = true;
-
-  using namespace std::chrono_literals;
-
   while (!gameFinished()) {
-    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
 
     // TODO: Add logic for people to read correct answer and give results of the
     // round
-
+    state = GAME_PAUSED;
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
-
+    // TODO: Add mutex logic so there is no possibility to read next question
+    // results
+    state = GAME_PLAYING;
     nextRound();
+
+    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
   }
+
+  state = GAME_FINISHED;
 }
 
 void Game::print() {
