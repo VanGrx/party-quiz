@@ -57,9 +57,35 @@ var currQuestion = status["currQuestion"]+1;
 
 var questionText = currQuestion+"/"+status["totalQuestions"];
 
-var createdText = status["gameCreated"] == true ? "DA" : "NE";
-var readyText = status["gameReady"] == true ? "DA" : "NE";
-var startedText = status["gameStarted"] == true ? "DA" : "NE";
+var gameState = status["gameState"];
+var gameStateText = "Not Ready";
+if(gameState == 1)
+  gameStateText = "Game created";
+if(gameState == 2)
+  gameStateText = "Game playing";
+if(gameState == 3){
+  gameStateText = "Game paused";
+
+  var correctAnsIndex = status["correctAnswer"];
+
+if(correctAnsIndex == 0)
+  document.getElementById("answer1").style.color="green";
+  if(correctAnsIndex == 1)
+    document.getElementById("answer2").style.color="green";
+  if(correctAnsIndex == 2)
+    document.getElementById("answer3").style.color="green";
+  if(correctAnsIndex == 3)
+    document.getElementById("answer4").style.color="green";
+}else{
+document.getElementById("answer1").style.color="black";
+document.getElementById("answer2").style.color="black";
+document.getElementById("answer3").style.color="black";
+document.getElementById("answer4").style.color="black";
+
+}
+if(gameState == 4)
+  gameStateText = "Game finished";
+
 
 document.getElementById("cookieValue").innerHTML=document.cookie;
 
@@ -67,19 +93,17 @@ document.getElementById("cookieValue").innerHTML=document.cookie;
 document.getElementById("gameID").innerHTML = status["gameID"];
 document.getElementById("playersConnected").innerHTML = playerText;
 document.getElementById("questions").innerHTML = questionText;
-document.getElementById("gameCreated").innerHTML = createdText;
-document.getElementById("gameReady").innerHTML = readyText;
-document.getElementById("gameStarted").innerHTML = startedText;
+document.getElementById("gameState").innerHTML = gameStateText;
 
 
 newQuestion = (currentQuestion != currQuestion);
 
 
-if(status["gameReady"] == true && status["gameStarted"] == false){
+if(status["gameState"] == 1){
 
   startGame();
 
-} else if(status["gameOver"] == false && newQuestion){
+} else if(status["gameState"] == 2 && newQuestion){
 
   currentQuestion = currQuestion;
 
@@ -97,7 +121,7 @@ if(status["gameReady"] == true && status["gameStarted"] == false){
 
   getScores();
 
-} else if(status["gameOver"] == true){
+} else if(status["gameState"] == 4){
 document.getElementById("pitanjeDiv").style.display = "none";
 getScores();
 
@@ -203,15 +227,8 @@ window.setInterval(function(){
 <label >ID igre:</label>
 <label id="gameID">0</label>
 <br/>
-<label >Pitanja inicijalizovana:</label>
-<label id="gameCreated">Ne</label>
-<br/>
-<label >Igra spremna:</label>
-<label id="gameReady">Ne</label>
-<br/>
-
-<label >Igra pocela:</label>
-<label id="gameStarted">Ne</label>
+<label >Status igre:</label>
+<label id="gameState"></label>
 <br/>
 
 <label >Igraca konektovano:</label>
@@ -232,7 +249,7 @@ window.setInterval(function(){
 <label id="answer3"></label><br/>
 <label id="answer4"></label><br/>
 </div>
-
+<br/>
 
 
 

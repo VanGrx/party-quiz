@@ -52,10 +52,12 @@ var questionText = currQuestion+"/"+status["totalQuestions"];
 document.getElementById("questions").innerHTML = questionText;
 
 
-if(status["gameReady"] == true && status["gameStarted"] == false){
+var gameStatus = status["gameState"]
+
+if(status["gameState"] != 2){
 
 
-} else if(status["gameOver"] == false && currQuestion!=currentQuestion){
+} else if(status["gameState"] == 2 && currQuestion!=currentQuestion){
 
   currentQuestion = currQuestion;
   answerGiven = false;
