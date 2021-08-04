@@ -41,14 +41,16 @@ set(game_include_files
     src/game/game.h
     src/game/question.h
     src/game/player.h
+    src/game/gameconfig.h
+    src/game/questionsgenerator.h
     )
 
 set(game_source_files
-    src/main.cpp
     src/game/game.cpp
     src/game/question.cpp
     src/game/player.cpp
     src/game/randomgenerator.cpp
+    src/game/questionsgenerator.cpp
     )
 
 

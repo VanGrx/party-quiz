@@ -1,0 +1,16 @@
+#ifndef UTILS_H
+#define UTILS_H
+
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+#include <iostream>
+
+namespace beast = boost::beast; // from <boost/beast.hpp>
+
+// ---------------------------------------------------------------------------------------
+// Game relative
+constexpr unsigned int POINTS_FOR_CORRECT_ANSWER = 10;
+constexpr unsigned int MAX_ID = 1000000;
+
+#endif // UTILS_H
