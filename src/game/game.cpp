@@ -116,7 +116,12 @@ void Game::playGame() {
   using namespace std::chrono_literals;
 
   while (!gameFinished()) {
-    std::this_thread::sleep_for(20s);
+    std::this_thread::sleep_for(std::chrono::seconds(ROUND_TIME));
+
+    // TODO: Add logic for people to read correct answer and give results of the
+    // round
+
+    std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
 
     nextRound();
   }
