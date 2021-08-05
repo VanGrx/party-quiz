@@ -59,7 +59,6 @@ bool Game::allPlayersAnswered() {
 
   unsigned int currenQuestion = currQuestion;
 
-  // TODO: Add better calculation if player anwered all questions so far
   return std::all_of(players.begin(), players.end(),
                      [&currenQuestion](const Player &player) {
                        return player.questionsAnswered > currenQuestion;
@@ -137,12 +136,8 @@ void Game::playGame() {
     }
     state = GAME_PAUSED;
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
-    // TODO: Add logic for people to read correct answer and give results of the
-    // round
 
-    // TODO: Add mutex logic so there is no possibility to read next question
-    // results
-
+    state = GAME_PREPARE;
     nextRound();
   }
 

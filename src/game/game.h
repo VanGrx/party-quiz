@@ -19,7 +19,8 @@ public:
     GAME_CREATED,
     GAME_PLAYING,
     GAME_PAUSED,
-    GAME_FINISHED
+    GAME_FINISHED,
+    GAME_PREPARE
   };
 
   int createGame(unsigned int _playerNumber);
