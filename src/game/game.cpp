@@ -62,7 +62,7 @@ bool Game::allPlayersAnswered() {
   // TODO: Add better calculation if player anwered all questions so far
   return std::all_of(players.begin(), players.end(),
                      [&currenQuestion](const Player &player) {
-                       return player.questionsAnswered >= currenQuestion;
+                       return player.questionsAnswered > currenQuestion;
                      });
 }
 
@@ -90,16 +90,15 @@ Player Game::getPlayer(int id) {
 
 void Game::playerAnswered(int id, int answerGiven) {
 
+  if (!gameRunning())
+    return;
+
   auto player =
       find_if(players.begin(), players.end(),
               [&id](const auto &currPlayer) { return currPlayer.id == id; });
 
-  // TODO: Add better logic how to check if played answered already
-  // If player already answered, ignore
-  if (player->questionsAnswered >= currQuestion)
-    return;
-
-  player->gaveAnswer(giveQuestion().correctAnswerIndex == answerGiven);
+  player->gaveAnswer(currQuestion, answerGiven,
+                     giveQuestion().correctAnswerIndex == answerGiven);
 }
 
 void Game::getQuestions() {

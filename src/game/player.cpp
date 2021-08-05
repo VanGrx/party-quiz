@@ -3,12 +3,21 @@
 
 Player::Player() {}
 
-void Player::gaveAnswer(bool correct) {
+void Player::gaveAnswer(unsigned int questionIndex, unsigned int answer,
+                        bool correct) {
 
-  // TODO: Add beter logic for saving where player answered
-  // Example: Some skips a question and answers twice for one and gets double
-  // points
-  questionsAnswered++;
+  if (questionIndex < questionsAnswered)
+    return;
+
+  auto it = find_if(answersGiven.begin(), answersGiven.end(),
+                    [&questionIndex](const auto &answer) {
+                      return answer.first == questionIndex;
+                    });
+
+  if (it != answersGiven.end())
+    return;
+  answersGiven.emplace_back(questionIndex, answer);
+  questionsAnswered = questionIndex + 1;
   if (correct)
     score += POINTS_FOR_CORRECT_ANSWER;
 }
