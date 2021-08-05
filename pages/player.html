@@ -26,12 +26,12 @@ $.ajax({
   url: "./player.html",
   data: data,
   success: function(data){
-        console.log("Answered");
+  document.getElementById("pitanjeDiv").style.display = "none";
 
       },
   error: function(error){
     console.log("Error:");
-    console.log(error);
+  document.getElementById("pitanjeDiv").style.display = "none";
 }
 });
 
@@ -106,7 +106,7 @@ $.ajax({
 
 window.setInterval(function(){
   getPlayerStatus();  //calling every .5 seconds
-}, 500);
+}, 200);
 
 </script>
 

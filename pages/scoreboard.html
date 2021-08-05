@@ -66,6 +66,8 @@ if(gameState == 2)
 if(gameState == 3){
   gameStateText = "Game paused";
 
+getScores();
+
   var correctAnsIndex = status["correctAnswer"];
 
 if(correctAnsIndex == 0)
@@ -213,7 +215,7 @@ $.ajax({
 
 window.setInterval(function(){
   getStatus();  //calling every .5 seconds
-}, 500);
+}, 200);
 
 
 
