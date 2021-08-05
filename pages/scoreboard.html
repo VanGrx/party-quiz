@@ -13,6 +13,8 @@
 var newQuestion = false;
 var currentQuestion = "";
 
+var gameStarted = false;
+
 var time;
 var timer;
 
@@ -101,9 +103,10 @@ document.getElementById("gameState").innerHTML = gameStateText;
 newQuestion = (currentQuestion != currQuestion);
 
 
-if(status["gameState"] == 1){
+if(status["gameState"] == 6 && gameStarted == false){
 
   startGame();
+  gameStarted = true;
 
 } else if(status["gameState"] == 2 && newQuestion){
 
