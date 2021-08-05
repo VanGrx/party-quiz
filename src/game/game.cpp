@@ -25,10 +25,6 @@ void Game::clearGame() {
   state = GAME_NULL;
 }
 
-bool Game::gameReady() {
-  return GAME_CREATED && players.size() > 0 && players.size() == playerNumber;
-}
-
 int Game::addPlayer(std::string name) {
 
   int id = rand.getNextRandom();
@@ -38,6 +34,9 @@ int Game::addPlayer(std::string name) {
     id = rand.getNextRandom();
 
   players.emplace_back(id, name);
+
+  if (players.size() == playerNumber)
+    state = GAME_READY;
 
   return id;
 }
@@ -54,6 +53,8 @@ bool Game::gameFinished() { return state == GAME_FINISHED; }
 bool Game::gameRunning() { return state == GAME_PLAYING; }
 
 bool Game::gamePaused() { return state == GAME_PAUSED; }
+
+bool Game::gameReady() { return state == GAME_READY; }
 
 bool Game::allPlayersAnswered() {
 

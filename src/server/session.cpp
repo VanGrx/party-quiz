@@ -302,9 +302,8 @@ void Session::handleScoreboardRequest(
 
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["gameStart"] != "") {
-      // TODO: Create normal answer or generic one
       callbackReceiver->startGame();
-      std::string message = "'name':'example'";
+      std::string message = "{}";
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["scores"] != "") {
       std::string message = callbackReceiver->getScoresJSONString();
