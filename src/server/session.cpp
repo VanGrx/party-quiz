@@ -171,7 +171,9 @@ void Session::handle_request(
   } else if (isScoreboardRequest) {
 
     handleScoreboardRequest(doc_root, std::move(req), std::move(send));
-  }
+  } else
+    return returnRequestedPage(path_cat(doc_root, req.target()), std::move(req),
+                               send);
 }
 
 //-------------------------------------------------------------------------------------------------
