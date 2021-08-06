@@ -1,5 +1,5 @@
 body {
-  background: #FFEAC9;
+  background: #E2E2E2;
   color: #FF616D;
   font-size: 45px;
   text-align: center;
@@ -14,6 +14,16 @@ body {
   padding: 20px;
   width: 75%;
 }*/
+
+header {
+  border-radius: 25px;
+  background-color: #0A2463;
+  padding: 30px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+
+}
 
 .block{
   margin: auto;
@@ -45,8 +55,8 @@ body {
 }
 
 .questions{
-  background: #66DE93;
-  color: #D83A56;
+  background: #247BA0;
+  color: #E2E2E2;
 margin: 25px;
 width: 110%;
 padding: 5px;
@@ -54,8 +64,8 @@ padding: 5px;
 }
 
 .scores{
-  background: #FF616D;
-  color: #D83A56;
+  background: #FB3640;
+  color: #E2E2E2;
 margin: 25px;
 width: 40%;
 
@@ -65,14 +75,6 @@ width: 40%;
   
 }
 
-header {
-  border-radius: 25px;
-  background-color: #FF616D;
-  padding: 30px;
-  text-align: center;
-  font-size: 35px;
-  color: white;
 
-}
 
 
