@@ -54,6 +54,7 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   if (ec)
     return fail(ec, "read");
 
+  // TODO: We should save websocket to send data to it
   // See if it is a WebSocket Upgrade
   if (websocket::is_upgrade(req_)) {
     // Create a websocket session, transferring ownership

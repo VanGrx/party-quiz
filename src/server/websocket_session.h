@@ -87,6 +87,8 @@ private:
     if (ec)
       fail(ec, "read");
 
+    // TODO: Return what we must send and add functions to handle calls from
+    // listener
     // Echo the message
     ws_.text(ws_.got_text());
     ws_.async_write(buffer_.data(),
