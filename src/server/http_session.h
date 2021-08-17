@@ -1,5 +1,5 @@
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef HTTP_SESSION_H
+#define HTTP_SESSION_H
 
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>
@@ -135,4 +135,4 @@ public:
                       Send &&send);
 };
 
-#endif // SESSION_H
+#endif // HTTP_SESSION_H

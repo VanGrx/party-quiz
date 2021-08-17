@@ -1,4 +1,4 @@
-#include "session.h"
+#include "http_session.h"
 #include "pages.h"
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>

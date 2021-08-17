@@ -21,7 +21,8 @@ include_directories(${Boost_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS} src/server src/ga
 set(server_include_files
     src/server/server.h
     src/server/listener.h
-    src/server/session.h
+    src/server/http_session.h
+    src/server/websocket_session.h
     src/server/utils.h
     src/server/pages.h
     src/server/callbacks.h
@@ -31,7 +32,8 @@ set(server_source_files
     src/main.cpp
     src/server/server.cpp
     src/server/listener.cpp
-    src/server/session.cpp
+    src/server/http_session.cpp
+    src/server/websocket_session.cpp
     src/server/utils.cpp
     )
 

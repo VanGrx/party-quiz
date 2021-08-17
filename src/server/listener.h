@@ -17,7 +17,7 @@
 
 #include "callbacks.h"
 #include "game.h"
-#include "session.h"
+#include "http_session.h"
 #include "utils.h"
 
 namespace beast = boost::beast;   // from <boost/beast.hpp>
