@@ -223,3 +223,13 @@ int Listener::playerEntered(int roomID, std::string username) {
 void Listener::answerGiven(int id, int answerGiven) {
   game.playerAnswered(id, answerGiven);
 }
+
+// WebSocket callbacks
+bool Listener::webSocketConnected(
+    std::shared_ptr<websocket_session> newSession) {
+
+  // Create the session and run it
+  webSessions.push_back(newSession);
+
+  return true;
+}

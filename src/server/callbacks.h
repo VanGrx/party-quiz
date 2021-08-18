@@ -3,7 +3,9 @@
 
 #include "game.h"
 #include "question.h"
+#include "websocket_session.h"
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -23,6 +25,10 @@ public:
   // Player callbacks
   virtual int playerEntered(int roomID, std::string username) = 0;
   virtual void answerGiven(int id, int answerGiven) = 0;
+
+  // WebSocket callbacks
+  virtual bool
+  webSocketConnected(std::shared_ptr<websocket_session> newSession) = 0;
 };
 
 #endif // CALLBACKS_H

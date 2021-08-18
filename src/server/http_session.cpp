@@ -59,8 +59,10 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   if (websocket::is_upgrade(req_)) {
     // Create a websocket session, transferring ownership
     // of both the socket and the HTTP request.
-    std::make_shared<websocket_session>(stream_.release_socket())
-        ->do_accept(std::move(req_));
+    auto newSession =
+        std::make_shared<websocket_session>(stream_.release_socket());
+    callbackReceiver->webSocketConnected(newSession);
+    newSession->do_accept(std::move(req_));
     return;
   }
 
