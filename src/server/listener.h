@@ -35,8 +35,8 @@ class Listener : public std::enable_shared_from_this<Listener>,
   Game game;
 
   std::mutex sessionsMutex;
-  std::vector<std::shared_ptr<Session>> sessions;
-  std::vector<std::shared_ptr<websocket_session>> webSessions;
+  std::vector<std::shared_ptr<HttpSession>> httpSessions;
+  std::vector<std::shared_ptr<WebSocketSession>> webSessions;
 
 public:
   // Scoreboard callback
@@ -58,7 +58,7 @@ public:
 
   // WebSocket callbacks
   virtual bool
-  webSocketConnected(std::shared_ptr<websocket_session> newSession) override;
+  webSocketConnected(std::shared_ptr<WebSocketSession> newSession) override;
 
   Listener(net::io_context &ioc, tcp::endpoint endpoint,
            std::shared_ptr<std::string const> const &doc_root);

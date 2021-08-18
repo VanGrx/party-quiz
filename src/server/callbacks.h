@@ -28,7 +28,7 @@ public:
 
   // WebSocket callbacks
   virtual bool
-  webSocketConnected(std::shared_ptr<websocket_session> newSession) = 0;
+  webSocketConnected(std::shared_ptr<WebSocketSession> newSession) = 0;
 };
 
 #endif // CALLBACKS_H

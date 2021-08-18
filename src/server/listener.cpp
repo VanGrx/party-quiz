@@ -51,11 +51,11 @@ void Listener::on_accept(beast::error_code ec, tcp::socket socket) {
     fail(ec, "accept");
   } else {
     // Create the session and run it
-    sessions.emplace_back(std::make_shared<Session>(
+    httpSessions.emplace_back(std::make_shared<HttpSession>(
         std::move(socket), doc_root_,
         std::static_pointer_cast<CallbackListener>(shared_from_this())));
 
-    sessions.back()->run();
+    httpSessions.back()->run();
   }
 
   // Accept another connection
@@ -226,7 +226,7 @@ void Listener::answerGiven(int id, int answerGiven) {
 
 // WebSocket callbacks
 bool Listener::webSocketConnected(
-    std::shared_ptr<websocket_session> newSession) {
+    std::shared_ptr<WebSocketSession> newSession) {
 
   // Create the session and run it
   webSessions.push_back(newSession);
