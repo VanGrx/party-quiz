@@ -36,9 +36,7 @@ public:
   explicit WebSocketSession(tcp::socket &&socket) : ws_(std::move(socket)) {}
 
   // Report a failure
-  void fail(beast::error_code ec, char const *what) {
-    std::cerr << what << ": " << ec.message() << "\n";
-  }
+  void fail(beast::error_code ec, char const *what);
 
   // Start the asynchronous accept operation
   template <class Body, class Allocator>

@@ -67,3 +67,10 @@ void WebSocketSession::do_accept(
   ws_.async_accept(req, beast::bind_front_handler(&WebSocketSession::on_accept,
                                                   shared_from_this()));
 }
+
+void WebSocketSession::fail(beast::error_code ec, char const *what) {
+  std::cerr << what << ": " << ec.message() << "\n";
+}
+
+template void WebSocketSession::do_accept<http::string_body>(
+    http::request<http::string_body>);
