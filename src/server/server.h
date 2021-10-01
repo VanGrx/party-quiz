@@ -26,8 +26,8 @@ namespace net = boost::asio;      // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
 // Accepts incoming connections and launches the sessions
-class Server : public std::enable_shared_from_this<Server>,
-               public CallbackListener {
+class Server final : public std::enable_shared_from_this<Server>,
+                     public CallbackListener {
 
   int threads;
   std::shared_ptr<std::string const> doc_root_;
