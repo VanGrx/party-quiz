@@ -16,6 +16,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <rapidjson/document.h>
 #include <string>
 #include <thread>
 #include <vector>
@@ -49,7 +50,14 @@ private:
 
   void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
+  void do_write(const std::string &message);
+
   void on_write(beast::error_code ec, std::size_t bytes_transferred);
+
+  void handle_request();
+
+  void handlePlayerRequest(rapidjson::Document &document);
+  void handleScoreboardRequest(rapidjson::Document &document);
 };
 
 #endif // WEBSOCKET_SESSION_H
