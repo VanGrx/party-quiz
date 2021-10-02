@@ -145,6 +145,11 @@ void Game::playGame() {
   state = GAME_FINISHED;
 }
 
+void Game::changeState(const GameState state_) {
+  state = state_;
+  callbackReceiver->stateChanged();
+}
+
 void Game::print() {
 
   for (auto it : questions)

@@ -255,3 +255,8 @@ bool Server::webSocketConnected(std::shared_ptr<WebSocketSession> newSession) {
 
   return true;
 }
+
+// Game callbacks
+void Server::stateChanged(){
+
+};

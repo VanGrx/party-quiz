@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 
+#include "callbacks.h"
 #include "player.h"
 #include "question.h"
 #include "randomgenerator.h"
@@ -41,6 +42,7 @@ public:
 
   Player getPlayer(int id);
 
+  void changeState(const GameState state_);
   void print();
 
   // Thread start and thread run functions
@@ -51,6 +53,8 @@ public:
   std::thread gamePlayingThread;
 
   RandomGenerator rand;
+
+  std::shared_ptr<CallbackListener> callbackReceiver;
 
   std::vector<Question> questions;
   std::vector<Player> players;

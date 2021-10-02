@@ -62,6 +62,9 @@ public:
   virtual bool
   webSocketConnected(std::shared_ptr<WebSocketSession> newSession) override;
 
+  // Game callbacks
+  virtual void stateChanged() override;
+
   Server(int threads_, tcp::endpoint endpoint, std::string &doc_root);
 
   // Start accepting incoming connections

@@ -1,7 +1,6 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
-#include "game.h"
 #include "question.h"
 #include "websocket_session.h"
 #include <iostream>
@@ -29,6 +28,9 @@ public:
   // WebSocket callbacks
   virtual bool
   webSocketConnected(std::shared_ptr<WebSocketSession> newSession) = 0;
+
+  // Game callbacks
+  virtual void stateChanged() = 0;
 };
 
 #endif // CALLBACKS_H
