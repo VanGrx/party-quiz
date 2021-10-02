@@ -1,7 +1,11 @@
 #include "websocket_session.h"
+#include "callbacks.h"
+#include <algorithm>
+#include <cstdlib>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <string>
 
 void WebSocketSession::on_accept(beast::error_code ec) {
   if (ec)
@@ -42,6 +46,7 @@ void WebSocketSession::handle_request() {
   if (document.Parse<0>(got_text.c_str()).HasParseError()) {
     return do_write("Bad json file given");
   }
+  // TODO: Parse and check json fields
 
   if (document["type"] == "player")
     handlePlayerRequest(document);
@@ -49,17 +54,25 @@ void WebSocketSession::handle_request() {
     handleScoreboardRequest(document);
 }
 
-void WebSocketSession::handlePlayerRequest(rapidjson::Document &document) {
+void WebSocketSession::handlePlayerRequest(
+    const rapidjson::Document &document) {
 
   // TODO: Add player logic
   if (document["player"] == 1)
     do_write("Player example");
 }
-void WebSocketSession::handleScoreboardRequest(rapidjson::Document &document) {
+void WebSocketSession::handleScoreboardRequest(
+    const rapidjson::Document &document) {
 
   // TODO: Add scoreboard logic
-  if (document["scoreboard"] == 1)
-    do_write("Scoreboard example");
+  if (document["method"] == "gameInit") {
+    int playerNumber = document["numberOfPlayers"].GetInt();
+
+    do_write("Scoreboard example" + std::to_string(playerNumber));
+
+    gameID = callbackReceiver->gameInitCallback(playerNumber);
+  }
+  do_write("Scoreboard example");
 }
 
 void WebSocketSession::do_write(const std::string &message) {

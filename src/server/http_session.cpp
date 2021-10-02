@@ -58,8 +58,8 @@ void HttpSession::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   if (websocket::is_upgrade(req_)) {
     // Create a websocket session, transferring ownership
     // of both the socket and the HTTP request.
-    auto newSession =
-        std::make_shared<WebSocketSession>(stream_.release_socket());
+    auto newSession = std::make_shared<WebSocketSession>(
+        stream_.release_socket(), callbackReceiver);
     callbackReceiver->webSocketConnected(newSession);
     newSession->do_accept(std::move(req_));
     return;
@@ -217,7 +217,7 @@ void HttpSession::handlePlayerRequest(
                                         http::status::bad_request,
                                         "Cookie with session ID not found!"));
 
-      int id = stoi(cookieList["sessionID"]);
+      int id = std::stoi(cookieList["sessionID"]);
 
       std::string message = callbackReceiver->getPlayerStatusJSONString(id);
 

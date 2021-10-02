@@ -21,6 +21,8 @@
 #include <thread>
 #include <vector>
 
+class CallbackListener;
+
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
@@ -34,7 +36,9 @@ class WebSocketSession : public std::enable_shared_from_this<WebSocketSession> {
 
 public:
   // Take ownership of the socket
-  explicit WebSocketSession(tcp::socket &&socket) : ws_(std::move(socket)) {}
+  explicit WebSocketSession(tcp::socket &&socket,
+                            std::shared_ptr<CallbackListener> _listener)
+      : ws_(std::move(socket)), callbackReceiver(_listener) {}
 
   // Report a failure
   void fail(beast::error_code ec, char const *what);
@@ -44,6 +48,9 @@ public:
   void do_accept(http::request<Body, http::basic_fields<Allocator>> req);
 
 private:
+  std::shared_ptr<CallbackListener> callbackReceiver;
+  int gameID;
+
   void on_accept(beast::error_code ec);
 
   void do_read();
@@ -56,8 +63,8 @@ private:
 
   void handle_request();
 
-  void handlePlayerRequest(rapidjson::Document &document);
-  void handleScoreboardRequest(rapidjson::Document &document);
+  void handlePlayerRequest(const rapidjson::Document &document);
+  void handleScoreboardRequest(const rapidjson::Document &document);
 };
 
 #endif // WEBSOCKET_SESSION_H
