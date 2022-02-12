@@ -55,7 +55,12 @@ int main(int argc, char *argv[]) {
   auto port = static_cast<unsigned short>(std::atoi(argv[2]));
   auto doc_root = std::string(argv[3]);
 
-  std::shared_ptr<Server> server = std::make_shared<Server>(threads, tcp::endpoint{address, port}, doc_root);
+  std::shared_ptr<Server> server = std::make_shared<Server>(threads, doc_root);
+
+  if (!server->init(tcp::endpoint{address, port})) {
+    std::cerr << "Init failed!\n";
+    return EXIT_FAILURE;
+  }
 
   server->start();
 

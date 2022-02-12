@@ -3,38 +3,42 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-Server::Server(int threads_, tcp::endpoint endpoint, std::string &doc_root)
+Server::Server(int threads_, std::string &doc_root)
     : threads{threads_}, doc_root_{std::make_shared<std::string>(doc_root)},
-      ioc_{threads}, acceptor_(net::make_strand(ioc_)) {
+      ioc_{threads}, acceptor_(net::make_strand(ioc_)) {}
+
+bool Server::init(tcp::endpoint endpoint) {
+
   beast::error_code ec;
 
   // Open the acceptor
   acceptor_.open(endpoint.protocol(), ec);
   if (ec) {
     fail(ec, "open");
-    return;
+    return false;
   }
 
   // Allow address reuse
   acceptor_.set_option(net::socket_base::reuse_address(true), ec);
   if (ec) {
     fail(ec, "set_option");
-    return;
+    return false;
   }
 
   // Bind to the server address
   acceptor_.bind(endpoint, ec);
   if (ec) {
     fail(ec, "bind");
-    return;
+    return false;
   }
 
   // Start listening for connections
   acceptor_.listen(net::socket_base::max_listen_connections, ec);
   if (ec) {
     fail(ec, "listen");
-    return;
+    return false;
   }
+  return true;
 }
 
 void Server::start() {

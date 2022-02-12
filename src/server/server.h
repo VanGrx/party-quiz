@@ -65,12 +65,14 @@ public:
   // Game callbacks
   virtual void stateChanged() override;
 
-  Server(int threads_, tcp::endpoint endpoint, std::string &doc_root);
+  Server(int threads_, std::string &doc_root);
 
   // Start accepting incoming connections
   void run();
 
   void start();
+
+  bool init(tcp::endpoint endpoint);
 
 private:
   void do_accept();
