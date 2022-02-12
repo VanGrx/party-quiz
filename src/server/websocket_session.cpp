@@ -46,12 +46,16 @@ void WebSocketSession::handle_request() {
   if (document.Parse<0>(got_text.c_str()).HasParseError()) {
     return do_write("Bad json file given");
   }
-  // TODO: Parse and check json fields
+
+  if (!document.HasMember("type") || !document["type"].IsString())
+    return do_write("Bad json file given");
 
   if (document["type"] == "player")
     handlePlayerRequest(document);
   else if (document["type"] == "scoreboard")
     handleScoreboardRequest(document);
+  else
+    return do_write("Bad json file given");
 }
 
 void WebSocketSession::handlePlayerRequest(
@@ -64,15 +68,21 @@ void WebSocketSession::handlePlayerRequest(
 void WebSocketSession::handleScoreboardRequest(
     const rapidjson::Document &document) {
 
-  // TODO: Add scoreboard logic
+  if (!document.HasMember("method") || !document["method"].IsString())
+    return do_write("Bad json file given");
+
   if (document["method"] == "gameInit") {
+    // TODO: Add scoreboard logic
+    if (!document.HasMember("numberOfPlayers") ||
+        !document["numberOfPlayers"].IsInt())
+      return do_write("Bad json file given");
+
     int playerNumber = document["numberOfPlayers"].GetInt();
 
     do_write("Scoreboard example" + std::to_string(playerNumber));
 
     gameID = callbackReceiver->gameInitCallback(playerNumber);
   }
-  do_write("Scoreboard example");
 }
 
 void WebSocketSession::do_write(const std::string &message) {
