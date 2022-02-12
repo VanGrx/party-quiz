@@ -1,2 +1,6 @@
 *.user
 build
+
+# Kdevelop files
+*.kdev4
+
