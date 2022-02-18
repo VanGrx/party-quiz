@@ -81,22 +81,9 @@ void WebSocketSession::handleScoreboardRequest(
 
     gameID = callbackReceiver->gameInitCallback(playerNumber);
 
-    // TODO: Abstract this code
+    std::string message = callbackReceiver->getGameStatusJSONString();
 
-    rapidjson::Document d;
-
-    d.SetObject();
-
-    d.AddMember("sessionID", gameID, d.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer,
-                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
-        writer(buffer);
-
-    d.Accept(writer);
-
-    do_write(buffer.GetString());
+    do_write(message);
   }
 }
 
