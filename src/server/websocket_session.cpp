@@ -79,9 +79,24 @@ void WebSocketSession::handleScoreboardRequest(
 
     int playerNumber = document["numberOfPlayers"].GetInt();
 
-    do_write("Scoreboard example" + std::to_string(playerNumber));
-
     gameID = callbackReceiver->gameInitCallback(playerNumber);
+
+    // TODO: Abstract this code
+
+    rapidjson::Document d;
+
+    d.SetObject();
+
+    d.AddMember("sessionID", gameID, d.GetAllocator());
+
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer,
+                      rapidjson::Document::EncodingType, rapidjson::ASCII<>>
+        writer(buffer);
+
+    d.Accept(writer);
+
+    do_write(buffer.GetString());
   }
 }
 
