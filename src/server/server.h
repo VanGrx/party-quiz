@@ -63,7 +63,7 @@ public:
   webSocketConnected(std::shared_ptr<WebSocketSession> newSession) override;
 
   // Game callbacks
-  virtual void stateChanged() override;
+  virtual void stateChanged(int gameID) override;
 
   Server(int threads_, std::string &doc_root);
 

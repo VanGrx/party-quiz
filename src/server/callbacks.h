@@ -30,7 +30,7 @@ public:
   webSocketConnected(std::shared_ptr<WebSocketSession> newSession) = 0;
 
   // Game callbacks
-  virtual void stateChanged() = 0;
+  virtual void stateChanged(int gameID) = 0;
 };
 
 #endif // CALLBACKS_H

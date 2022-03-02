@@ -7,10 +7,12 @@
 
 Game::Game() : rand(MAX_ID) {}
 
-int Game::createGame(unsigned int _playerNumber) {
+int Game::createGame(unsigned int _playerNumber,
+                     std::shared_ptr<CallbackListener> _listener) {
   clearGame();
-  playerNumber = _playerNumber;
   id = rand.getNextRandom();
+  callbackReceiver = _listener;
+  playerNumber = _playerNumber;
   if (questionCacheThread.joinable())
     questionCacheThread.join();
   questionCacheThread = std::thread(&Game::getQuestions, this);
@@ -147,7 +149,8 @@ void Game::changeState(const GameState state_) {
   gameMutex.lock();
   state = state_;
   gameMutex.unlock();
-  callbackReceiver->stateChanged();
+  if (callbackReceiver)
+    callbackReceiver->stateChanged(id);
 }
 
 void Game::print() {

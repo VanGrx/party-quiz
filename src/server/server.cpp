@@ -94,7 +94,7 @@ void Server::on_accept(beast::error_code ec, tcp::socket socket) {
 
 int Server::gameInitCallback(int playerCount) {
 
-  return game.createGame(playerCount);
+  return game.createGame(playerCount, shared_from_this());
 }
 
 std::vector<std::pair<std::string, unsigned int>> Server::getScores() {
@@ -261,6 +261,10 @@ bool Server::webSocketConnected(std::shared_ptr<WebSocketSession> newSession) {
 }
 
 // Game callbacks
-void Server::stateChanged(){
+void Server::stateChanged(int gameID) {
 
+  for (auto ws : webSessions) {
+    if (ws->getGameID() == gameID)
+      ws->gameStateChanged();
+  }
 };

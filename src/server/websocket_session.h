@@ -47,9 +47,16 @@ public:
   template <class Body, class Allocator>
   void do_accept(http::request<Body, http::basic_fields<Allocator>> req);
 
+  int getGameID() { return gameID; };
+
+  void gameStateChanged();
+
 private:
   std::shared_ptr<CallbackListener> callbackReceiver;
   int gameID;
+
+  std::mutex writeMutex;
+  std::mutex readMutex;
 
   void on_accept(beast::error_code ec);
 

@@ -16,6 +16,9 @@ void WebSocketSession::on_accept(beast::error_code ec) {
 }
 
 void WebSocketSession::do_read() {
+
+  if (!readMutex.try_lock())
+    return;
   // Read a message into our buffer
   ws_.async_read(buffer_, beast::bind_front_handler(&WebSocketSession::on_read,
                                                     shared_from_this()));
@@ -25,6 +28,7 @@ void WebSocketSession::on_read(beast::error_code ec,
                                std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
 
+  readMutex.unlock();
   // This indicates that the WebSocketSession was closed
   if (ec == websocket::error::closed)
     return;
@@ -89,6 +93,8 @@ void WebSocketSession::handleScoreboardRequest(
 
 void WebSocketSession::do_write(const std::string &message) {
 
+  writeMutex.lock();
+
   beast::flat_buffer write_buffer;
   write_buffer.commit(buffer_copy(write_buffer.prepare(message.size()),
                                   boost::asio::buffer(message)));
@@ -101,6 +107,8 @@ void WebSocketSession::do_write(const std::string &message) {
 void WebSocketSession::on_write(beast::error_code ec,
                                 std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
+
+  writeMutex.unlock();
 
   if (ec)
     return fail(ec, "write");
@@ -134,6 +142,12 @@ void WebSocketSession::do_accept(
 
 void WebSocketSession::fail(beast::error_code ec, char const *what) {
   std::cerr << what << ": " << ec.message() << "\n";
+}
+
+void WebSocketSession::gameStateChanged() {
+  std::string message = callbackReceiver->getGameStatusJSONString();
+
+  do_write(message);
 }
 
 template void WebSocketSession::do_accept<http::string_body>(
