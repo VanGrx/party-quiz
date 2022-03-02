@@ -52,21 +52,14 @@ function handleStatus(status) {
         gameStateText = "Game paused";
         getScores();
 
-        let correctAnsIndex = status.correctAnswer;
+        let correctAnsIndex = status.correctAnswer + 1;
 
-        if (correctAnsIndex === 0)
-            document.getElementById("answer1").style.background = "green";
-        if (correctAnsIndex === 1)
-            document.getElementById("answer2").style.background = "green";
-        if (correctAnsIndex === 2)
-            document.getElementById("answer3").style.background = "green";
-        if (correctAnsIndex === 3)
-            document.getElementById("answer4").style.background = "green";
+        document.getElementById("answer" + correctAnsIndex).style.background = "green";
+
     } else {
-        document.getElementById("answer1").style.background = "";
-        document.getElementById("answer2").style.background = "";
-        document.getElementById("answer3").style.background = "";
-        document.getElementById("answer4").style.background = "";
+        for (let i = 1; i <= 4; i++)
+            document.getElementById("answer" + i).style.background = "";
+
 
     }
     if (gameState === 4)
@@ -92,10 +85,9 @@ function handleStatus(status) {
 
         document.getElementById("pitanjeDiv").style.display = "block";
         document.getElementById("question").innerHTML = status.question;
-        document.getElementById("answer1").innerHTML = status.answers[0];
-        document.getElementById("answer2").innerHTML = status.answers[1];
-        document.getElementById("answer3").innerHTML = status.answers[2];
-        document.getElementById("answer4").innerHTML = status.answers[3];
+
+        for (let i = 1; i <= 4; i++)
+            document.getElementById("answer" + i).innerHTML = status.answers[i - 1];
 
         time = 20;
         clearInterval(timer);
