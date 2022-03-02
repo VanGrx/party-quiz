@@ -149,7 +149,7 @@ void Game::changeState(const GameState state_) {
   gameMutex.lock();
   state = state_;
   gameMutex.unlock();
-  if (callbackReceiver)
+  if (callbackReceiver && state != GAME_NULL)
     callbackReceiver->stateChanged(id);
 }
 
