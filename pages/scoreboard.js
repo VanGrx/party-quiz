@@ -6,6 +6,8 @@ let gameStarted = false;
 let time;
 let timer;
 
+let ws;
+
 function handleTimer() {
 
     document.getElementById("countdown").innerHTML = time;
@@ -53,18 +55,18 @@ function handleStatus(status) {
         let correctAnsIndex = status.correctAnswer;
 
         if (correctAnsIndex === 0)
-            document.getElementById("answer1").style.color = "green";
+            document.getElementById("answer1").style.background = "green";
         if (correctAnsIndex === 1)
-            document.getElementById("answer2").style.color = "green";
+            document.getElementById("answer2").style.background = "green";
         if (correctAnsIndex === 2)
-            document.getElementById("answer3").style.color = "green";
+            document.getElementById("answer3").style.background = "green";
         if (correctAnsIndex === 3)
-            document.getElementById("answer4").style.color = "green";
+            document.getElementById("answer4").style.background = "green";
     } else {
-        document.getElementById("answer1").style.color = "black";
-        document.getElementById("answer2").style.color = "black";
-        document.getElementById("answer3").style.color = "black";
-        document.getElementById("answer4").style.color = "black";
+        document.getElementById("answer1").style.background = "";
+        document.getElementById("answer2").style.background = "";
+        document.getElementById("answer3").style.background = "";
+        document.getElementById("answer4").style.background = "";
 
     }
     if (gameState === 4)
@@ -114,50 +116,65 @@ function handleStatus(status) {
 
 function startGame() {
 
-    var data = {};
+    if ("WebSocket" in window) {
+        let gameStart = {};
+        gameStart.type = "scoreboard";
+        gameStart.method = "gameStart";
+        ws.send(JSON.stringify(gameStart));
+    } else {
 
-    data.gameStart = "1";
+        var data = {};
 
-    $.ajax({
-        type: "GET",
-        url: "./scoreboard.html",
-        data: data,
-        success: function (data) {
-            console.log("GAME STARTED!");
+        data.gameStart = "1";
 
-        },
-        error: function (error) {
-            console.log("Error:");
-            console.log(error);
-        }
-    });
+        $.ajax({
+            type: "GET",
+            url: "./scoreboard.html",
+            data: data,
+            success: function (data) {
+                console.log("GAME STARTED!");
+
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
 
 }
 
 function getScores() {
 
-    var data = {};
+    if ("WebSocket" in window) {
+        let getScores = {};
+        getScores.type = "scoreboard";
+        getScores.method = "getScores";
+        ws.send(JSON.stringify(getScores));
+    } else {
 
-    data.scores = "1";
+        var data = {};
 
-    console.log("Calling scores");
+        data.scores = "1";
 
-    $.ajax({
-        type: "GET",
-        url: "./scoreboard.html",
-        data: data,
-        success: function (data) {
-            console.log("Calling scores returned");
+        console.log("Calling scores");
 
-            handleScores(data);
+        $.ajax({
+            type: "GET",
+            url: "./scoreboard.html",
+            data: data,
+            success: function (data) {
+                console.log("Calling scores returned");
 
-        },
-        error: function (error) {
-            console.log("Error:");
-            console.log(error);
-        }
-    });
+                handleScores(data);
 
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
 }
 
 
@@ -185,10 +202,10 @@ function getStatus() {
 
 }
 
-if ("WebSocket" in window) {
-    alert("WebSocket is supported by your Browser!");
 
-    let ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
+if ("WebSocket" in window) {
+
+    ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
 
     ws.onopen = function () {
 
@@ -200,8 +217,11 @@ if ("WebSocket" in window) {
     };
 
     ws.onmessage = function (evt) {
-        var received_msg = JSON.parse(evt.data);
-        handleStatus(received_msg);
+        let received_msg = JSON.parse(evt.data);
+        if (received_msg.gameState)
+            handleStatus(received_msg);
+        else
+            handleScores(received_msg);
     };
 
     ws.onclose = function () {

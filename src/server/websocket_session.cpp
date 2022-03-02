@@ -88,6 +88,11 @@ void WebSocketSession::handleScoreboardRequest(
     std::string message = callbackReceiver->getGameStatusJSONString();
 
     do_write(message);
+  } else if (document["method"] == "gameStart") {
+    callbackReceiver->startGame();
+  } else if (document["method"] == "getScores") {
+    std::string message = callbackReceiver->getScoresJSONString();
+    do_write(message);
   }
 }
 
