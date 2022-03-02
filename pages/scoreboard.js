@@ -9,7 +9,6 @@ let timer;
 function handleTimer() {
 
     document.getElementById("countdown").innerHTML = time;
-    console.log("TIME " + time);
 
     time = time - 1;
 
@@ -202,8 +201,6 @@ if ("WebSocket" in window) {
 
     ws.onmessage = function (evt) {
         var received_msg = JSON.parse(evt.data);
-        for (var k in received_msg)
-            alert(k + ": " + received_msg[k]);
         handleStatus(received_msg);
     };
 
