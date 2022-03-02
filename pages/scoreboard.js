@@ -193,13 +193,11 @@ if ("WebSocket" in window) {
 
     ws.onopen = function () {
 
-        alert("Message is sending...");
-        let grki = {};
-        grki.type = "scoreboard";
-        grki.method = "gameInit";
-        grki.numberOfPlayers = 1;
-        ws.send(JSON.stringify(grki));
-        alert("Message is sent: " + JSON.stringify(grki));
+        let gameInit = {};
+        gameInit.type = "scoreboard";
+        gameInit.method = "gameInit";
+        gameInit.numberOfPlayers = 1;
+        ws.send(JSON.stringify(gameInit));
     };
 
     ws.onmessage = function (evt) {
