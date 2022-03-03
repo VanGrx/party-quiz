@@ -38,7 +38,9 @@ public:
   // Take ownership of the socket
   explicit WebSocketSession(tcp::socket &&socket,
                             std::shared_ptr<CallbackListener> _listener)
-      : ws_(std::move(socket)), callbackReceiver(_listener) {}
+      : ws_(std::move(socket)), callbackReceiver(_listener) {
+    std::cout << "Creating WebSocket session" << std::endl;
+  }
 
   // Report a failure
   void fail(beast::error_code ec, char const *what);
@@ -54,6 +56,7 @@ public:
 private:
   std::shared_ptr<CallbackListener> callbackReceiver;
   int gameID;
+  int playerID;
 
   std::mutex writeMutex;
   std::mutex readMutex;

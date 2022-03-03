@@ -30,8 +30,10 @@ void WebSocketSession::on_read(beast::error_code ec,
 
   readMutex.unlock();
   // This indicates that the WebSocketSession was closed
-  if (ec == websocket::error::closed)
+  if (ec == websocket::error::closed) {
+    fail(ec, "close");
     return;
+  }
 
   if (ec)
     fail(ec, "read");
@@ -65,9 +67,29 @@ void WebSocketSession::handle_request() {
 void WebSocketSession::handlePlayerRequest(
     const rapidjson::Document &document) {
 
-  // TODO: Add player logic
-  if (document["player"] == 1)
-    do_write("Player example");
+  if (!document.HasMember("method") || !document["method"].IsString())
+    return do_write("Bad json file given");
+
+  if (document["method"] == "gameInit") {
+    if (!document.HasMember("roomNumber") || !document["roomNumber"].IsInt())
+      return do_write("Bad json file given");
+    if (!document.HasMember("username") || !document["username"].IsString())
+      return do_write("Bad json file given");
+
+    gameID = document["roomNumber"].GetInt();
+    std::string username = document["username"].GetString();
+
+    playerID = callbackReceiver->playerEntered(gameID, username);
+
+    if (playerID == 0) {
+      do_write("Invalid ID");
+    }
+
+    std::string message = callbackReceiver->getPlayerStatusJSONString(playerID);
+
+    do_write(message);
+  }
+  do_write("Player example");
 }
 void WebSocketSession::handleScoreboardRequest(
     const rapidjson::Document &document) {
@@ -76,7 +98,6 @@ void WebSocketSession::handleScoreboardRequest(
     return do_write("Bad json file given");
 
   if (document["method"] == "gameInit") {
-    // TODO: Add scoreboard logic
     if (!document.HasMember("numberOfPlayers") ||
         !document["numberOfPlayers"].IsInt())
       return do_write("Bad json file given");
@@ -146,6 +167,10 @@ void WebSocketSession::do_accept(
 }
 
 void WebSocketSession::fail(beast::error_code ec, char const *what) {
+
+  writeMutex.unlock();
+  readMutex.unlock();
+
   std::cerr << what << ": " << ec.message() << "\n";
 }
 

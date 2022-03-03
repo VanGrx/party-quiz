@@ -74,7 +74,7 @@ public:
       : stream_(std::move(socket)), doc_root_(doc_root), lambda_(*this),
         callbackReceiver(_listener) {
 
-    std::cout << "Creating session" << std::endl;
+    std::cout << "Creating HTTP session" << std::endl;
   }
 
   // Start the asynchronous operation
