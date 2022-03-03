@@ -4,53 +4,17 @@
     <meta charset="UTF-8">
     <title>Party Quiz</title>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-
-
-        function startGame() {
-
-            let formdata = $("#myform").serializeArray();
-            let data = {};
-            $(formdata).each(function (index, obj) {
-                data[obj.name] = obj.value;
-            });
-
-
-            let res = JSON.stringify(data)
-
-            console.log(res);
-
-
-            $.ajax({
-                type: "POST",
-                url: "./index.html",
-                data: data,
-                success: function (data) {
-
-                    let sessionID = data["sessionID"];
-
-                    document.cookie = "sessionID=" + sessionID;
-                    window.location.href = "." + data["redirect"];
-                },
-                error: function (error) {
-                    console.log("Error:");
-                    console.log(error);
-                }
-            });
-
-        }
-
-
-    </script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@200;500&display=swap" rel="stylesheet">
 
 </head>
 <body>
-<form name="myform" id="myform">
-    <label for="numberOfPlayers">Number of players:</label>
-    <input type="text" id="numberOfPlayers" name="numberOfPlayers"><br><br>
-    <input type="button" onClick="startGame()" value="Start Game">
-</form>
+<button onclick="window.location.href='scoreboardInit.html'">
+    Scoreboard Page
+</button>
+<button onclick="window.location.href='playerInit.html'">
+    Player Page
+</button>
 </body>
 </html>

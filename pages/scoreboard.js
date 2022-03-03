@@ -6,7 +6,7 @@ let gameStarted = false;
 let time;
 let timer;
 
-let ws;
+let ws = null;
 
 function handleTimer() {
 
@@ -108,7 +108,7 @@ function handleStatus(status) {
 
 function startGame() {
 
-    if ("WebSocket" in window) {
+    if (ws) {
         let gameStart = {};
         gameStart.type = "scoreboard";
         gameStart.method = "gameStart";
@@ -138,7 +138,7 @@ function startGame() {
 
 function getScores() {
 
-    if ("WebSocket" in window) {
+    if (ws) {
         let getScores = {};
         getScores.type = "scoreboard";
         getScores.method = "getScores";
@@ -204,7 +204,7 @@ if ("WebSocket" in window) {
         let gameInit = {};
         gameInit.type = "scoreboard";
         gameInit.method = "gameInit";
-        gameInit.numberOfPlayers = 1;
+        gameInit.numberOfPlayers = 2;
         ws.send(JSON.stringify(gameInit));
     };
 
@@ -220,6 +220,7 @@ if ("WebSocket" in window) {
 
         // websocket is closed.
         alert("Connection is closed...");
+        ws = null;
     };
 } else {
 
