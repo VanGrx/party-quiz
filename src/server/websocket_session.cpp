@@ -15,33 +15,6 @@ void WebSocketSession::on_accept(beast::error_code ec) {
   do_read();
 }
 
-void WebSocketSession::do_read() {
-
-  if (!readMutex.try_lock())
-    return;
-  // Read a message into our buffer
-  ws_.async_read(buffer_, beast::bind_front_handler(&WebSocketSession::on_read,
-                                                    shared_from_this()));
-}
-
-void WebSocketSession::on_read(beast::error_code ec,
-                               std::size_t bytes_transferred) {
-  boost::ignore_unused(bytes_transferred);
-
-  readMutex.unlock();
-  // This indicates that the WebSocketSession was closed
-  if (ec == websocket::error::closed) {
-    fail(ec, "close");
-    return;
-  }
-
-  if (ec)
-    fail(ec, "read");
-
-  // Send the response
-  handle_request();
-}
-
 void WebSocketSession::handle_request() {
 
   ws_.text(ws_.got_text());
@@ -117,9 +90,18 @@ void WebSocketSession::handleScoreboardRequest(
   }
 }
 
-void WebSocketSession::do_write(const std::string &message) {
+void WebSocketSession::async_write() {
+
+  std::string message;
 
   writeMutex.lock();
+  if (!writeQueue.empty())
+    message = writeQueue.at(0);
+  else {
+    writeMutex.unlock();
+    return;
+  }
+  writeMutex.unlock();
 
   beast::flat_buffer write_buffer;
   write_buffer.commit(buffer_copy(write_buffer.prepare(message.size()),
@@ -130,14 +112,63 @@ void WebSocketSession::do_write(const std::string &message) {
                                             shared_from_this()));
 }
 
+void WebSocketSession::do_write(const std::string &message) {
+
+  writeMutex.lock();
+  writeQueue.push_back(message);
+  // If we already have to write, leave it
+  if (writeQueue.size() > 1) {
+    writeMutex.unlock();
+    return;
+  }
+  writeMutex.unlock();
+
+  // TODO: Should probably be some logic if too many messages are left, right?
+
+  async_write();
+}
+
 void WebSocketSession::on_write(beast::error_code ec,
                                 std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
 
-  writeMutex.unlock();
-
   if (ec)
     return fail(ec, "write");
+
+  writeMutex.lock();
+  writeQueue.erase(writeQueue.begin());
+  if (!writeQueue.empty()) {
+    writeMutex.unlock();
+    async_write();
+    return;
+  }
+  writeMutex.unlock();
+}
+
+void WebSocketSession::do_read() {
+
+  // Read a message into our buffer
+  ws_.async_read(buffer_, beast::bind_front_handler(&WebSocketSession::on_read,
+                                                    shared_from_this()));
+}
+
+void WebSocketSession::on_read(beast::error_code ec,
+                               std::size_t bytes_transferred) {
+  boost::ignore_unused(bytes_transferred);
+
+  // This indicates that the WebSocketSession was closed
+  if (ec == websocket::error::closed) {
+    fail(ec, "close");
+    return;
+  }
+
+  if (ec) {
+    fail(ec, "read");
+    return;
+  }
+
+  // Send the response
+  handle_request();
 
   // Clear the buffer
   buffer_.consume(buffer_.size());
@@ -168,10 +199,7 @@ void WebSocketSession::do_accept(
 
 void WebSocketSession::fail(beast::error_code ec, char const *what) {
 
-  writeMutex.unlock();
-  readMutex.unlock();
-
-  std::cerr << what << ": " << ec.message() << "\n";
+  std::cerr << "WebSocket " << what << ": " << ec.message() << "\n";
 }
 
 void WebSocketSession::gameStateChanged() {

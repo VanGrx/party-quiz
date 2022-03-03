@@ -59,7 +59,7 @@ private:
   int playerID;
 
   std::mutex writeMutex;
-  std::mutex readMutex;
+  std::vector<std::string> writeQueue;
 
   void on_accept(beast::error_code ec);
 
@@ -68,6 +68,7 @@ private:
   void on_read(beast::error_code ec, std::size_t bytes_transferred);
 
   void do_write(const std::string &message);
+  void async_write();
 
   void on_write(beast::error_code ec, std::size_t bytes_transferred);
 
