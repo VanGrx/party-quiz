@@ -1,6 +1,6 @@
 *.user
 build
-
+*.idea
 # Kdevelop files
 *.kdev4
-
+*.cache
