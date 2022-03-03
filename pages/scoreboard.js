@@ -194,40 +194,78 @@ function getStatus() {
 
 }
 
+function createGame() {
 
-if ("WebSocket" in window) {
+    let formdata = $("#myform").serializeArray();
+    let data = {};
+    data.numberOfPlayers = parseInt(document.getElementById("numberOfPlayers").value);
 
-    ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
 
-    ws.onopen = function () {
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
 
-        let gameInit = {};
-        gameInit.type = "scoreboard";
-        gameInit.method = "gameInit";
-        gameInit.numberOfPlayers = 2;
-        ws.send(JSON.stringify(gameInit));
-    };
+        ws.onopen = function () {
 
-    ws.onmessage = function (evt) {
-        let received_msg = JSON.parse(evt.data);
-        if (received_msg.gameState)
-            handleStatus(received_msg);
-        else
-            handleScores(received_msg);
-    };
+            data.type = "scoreboard";
+            data.method = "gameInit";
 
-    ws.onclose = function () {
+            // TODO: HAndle cookies in this case
+            // let sessionID = data["sessionID"];
+            //
+            // document.cookie = "sessionID=" + sessionID;
+            document.getElementById("myform").style.display = "none";
+            document.getElementById("scoreboardDiv").style.display = "block";
 
-        // websocket is closed.
-        alert("Connection is closed...");
-        ws = null;
-    };
-} else {
+            ws.send(JSON.stringify(data));
+        };
 
-    // The browser doesn't support WebSocket
-    alert("WebSocket NOT supported by your Browser!");
-    window.setInterval(function () {
-        getStatus(); //calling every .5 seconds
-    }, 200);
+        ws.onmessage = function (evt) {
+            let received_msg = JSON.parse(evt.data);
+
+            if (received_msg.gameState)
+                handleStatus(received_msg);
+            else
+                handleScores(received_msg);
+        };
+
+        ws.onclose = function () {
+
+            // websocket is closed.
+            alert("Connection is closed...");
+            ws = null;
+        };
+    } else {
+        $.ajax({
+            type: "POST",
+            url: "./index.html",
+            data: data,
+            success: function (data) {
+
+                let sessionID = data["sessionID"];
+
+                document.cookie = "sessionID=" + sessionID;
+                document.getElementById("myform").style.show = "none";
+                document.getElementById("scoreboardDiv").style.display = "show";
+                // The browser doesn't support WebSocket
+                alert("WebSocket NOT supported by your Browser!");
+                window.setInterval(function () {
+                    getStatus(); //calling every .5 seconds
+                }, 200);
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
+
 }
+
+
+window.onbeforeunload = function () {
+    alert("closing");
+    if (ws.readyState === WebSocket.OPEN)
+        ws.close();
+};
+
 
