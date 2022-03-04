@@ -36,8 +36,6 @@ class Server final : public std::enable_shared_from_this<Server>,
 
   Game game;
 
-  std::mutex sessionsMutex;
-  std::vector<std::shared_ptr<HttpSession>> httpSessions;
   std::vector<std::shared_ptr<WebSocketSession>> webSessions;
 
 public:
