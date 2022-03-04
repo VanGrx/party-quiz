@@ -56,7 +56,7 @@ public:
 private:
   std::shared_ptr<CallbackListener> callbackReceiver;
   int gameID;
-  int playerID;
+  int playerID = 0;
 
   std::mutex writeMutex;
   std::vector<std::string> writeQueue;

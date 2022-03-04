@@ -61,8 +61,12 @@ void WebSocketSession::handlePlayerRequest(
     std::string message = callbackReceiver->getPlayerStatusJSONString(playerID);
 
     do_write(message);
+  } else if (document["method"] == "giveAnswer") {
+    if (!document.HasMember("answer") || !document["answer"].IsNumber())
+      return do_write("Bad json file given");
+    int answer = document["answer"].GetInt();
+    callbackReceiver->answerGiven(playerID, answer);
   }
-  do_write("Player example");
 }
 void WebSocketSession::handleScoreboardRequest(
     const rapidjson::Document &document) {
@@ -203,7 +207,13 @@ void WebSocketSession::fail(beast::error_code ec, char const *what) {
 }
 
 void WebSocketSession::gameStateChanged() {
-  std::string message = callbackReceiver->getGameStatusJSONString();
+
+  std::string message = "";
+
+  if (playerID == 0)
+    message = callbackReceiver->getGameStatusJSONString();
+  else
+    message = callbackReceiver->getPlayerStatusJSONString(playerID);
 
   do_write(message);
 }
