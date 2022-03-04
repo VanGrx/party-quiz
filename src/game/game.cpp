@@ -7,10 +7,12 @@
 
 Game::Game() : rand(MAX_ID) {}
 
-int Game::createGame(unsigned int _playerNumber) {
+int Game::createGame(unsigned int _playerNumber,
+                     std::shared_ptr<CallbackListener> _listener) {
   clearGame();
-  playerNumber = _playerNumber;
   id = rand.getNextRandom();
+  callbackReceiver = _listener;
+  playerNumber = _playerNumber;
   if (questionCacheThread.joinable())
     questionCacheThread.join();
   questionCacheThread = std::thread(&Game::getQuestions, this);
@@ -22,7 +24,7 @@ void Game::clearGame() {
   players.clear();
   currQuestion = 0;
   id = 0;
-  state = GAME_NULL;
+  changeState(GAME_NULL);
 }
 
 int Game::addPlayer(std::string name) {
@@ -36,7 +38,7 @@ int Game::addPlayer(std::string name) {
   players.emplace_back(id, name);
 
   if (players.size() == playerNumber)
-    state = GAME_READY;
+    changeState(GAME_READY);
 
   return id;
 }
@@ -99,6 +101,13 @@ void Game::playerAnswered(int id, int answerGiven) {
 
   player->gaveAnswer(currQuestion, answerGiven,
                      giveQuestion().correctAnswerIndex == answerGiven);
+
+  if (allPlayersAnswered()) {
+    std::unique_lock<std::mutex> lk(gameMutex);
+    questionFinished = true;
+    lk.unlock();
+    cv.notify_all();
+  }
 }
 
 void Game::getQuestions() {
@@ -111,10 +120,8 @@ void Game::getQuestions() {
     return;
 
   // We set that everything is OK and game is created
-  gameMutex.lock();
-  state = GAME_CREATED;
+  changeState(GAME_CREATED);
   std::cout << "GAME CREATED" << std::endl;
-  gameMutex.unlock();
 }
 
 void Game::startGame() {
@@ -127,22 +134,36 @@ void Game::playGame() {
 
   while (currQuestion < questions.size()) {
 
-    state = GAME_PLAYING;
-
-    unsigned timePassed = 0;
-
-    while (timePassed < ROUND_TIME && !allPlayersAnswered()) {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      timePassed++;
+    {
+      std::unique_lock<std::mutex> lk(gameMutex);
+      questionFinished = false;
+      lk.unlock();
     }
-    state = GAME_PAUSED;
+
+    changeState(GAME_PLAYING);
+
+    std::unique_lock<std::mutex> lk(gameMutex);
+    cv.wait_for(lk, std::chrono::seconds(ROUND_TIME),
+                [this] { return questionFinished; });
+    lk.unlock();
+
+    changeState(GAME_PAUSED);
+
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
 
-    state = GAME_PREPARE;
+    changeState(GAME_PREPARE);
     nextRound();
   }
 
-  state = GAME_FINISHED;
+  changeState(GAME_FINISHED);
+}
+
+void Game::changeState(const GameState state_) {
+  gameMutex.lock();
+  state = state_;
+  gameMutex.unlock();
+  if (callbackReceiver && state != GAME_NULL)
+    callbackReceiver->stateChanged(id);
 }
 
 void Game::print() {

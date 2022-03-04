@@ -1,82 +1,69 @@
-  var newQuestion = false;
-  var currentQuestion = "";
+let newQuestion = false;
+let currentQuestion = "";
 
-  var gameStarted = false;
+let gameStarted = false;
 
-  var time;
-  var timer;
+let time;
+let timer;
 
-  function handleTimer() {
+let ws = null;
 
+function handleTimer() {
 
-    // Output the result in an element with id="demo"
     document.getElementById("countdown").innerHTML = time;
-
-    console.log("TIME " + time);
 
     time = time - 1;
 
     if (time < 0) {
-      clearInterval(timer);
+        clearInterval(timer);
     }
 
-  }
+}
 
 
-  function handleScores(scores) {
-
+function handleScores(scores) {
 
     document.getElementById("scoresDiv").style.display = "block";
-
-
     document.getElementById("scoresDiv").innerHTML = "";
 
-    for (var i in scores) {
-      $('<div id="playerScore'+i+'" class="playerScore" style="text-align:left;">' + scores[i].username + ' <span style="float:right;">' + scores[i].score + '</span><\/div>').appendTo("#scoresDiv");
-
+    for (let i in scores) {
+        $('<div id="playerScore' + i + '" class="playerScore" style="text-align:left;">' + scores[i].username + ' <span style="float:right;">' + scores[i].score + '</span><\/div>').appendTo("#scoresDiv");
     }
 
-  }
+}
 
 
-  function handleStatus(status) {
+function handleStatus(status) {
 
-    var playerText = status.playersEntered + "/" + status.playerNumber;
+    let playerText = status.playersEntered + "/" + status.playerNumber;
+    let currQuestion = status.currQuestion + 1;
+    let questionText = currQuestion + "/" + status.totalQuestions;
+    let gameState = status.gameState;
+    let gameStateText = "Not Ready";
 
-    var currQuestion = status.currQuestion + 1;
+    if (gameState === 1)
+        gameStateText = "Game created";
 
-    var questionText = currQuestion + "/" + status.totalQuestions;
+    if (gameState === 2)
+        gameStateText = "Game playing";
 
-    var gameState = status.gameState;
-    var gameStateText = "Not Ready";
-    if (gameState == 1)
-      gameStateText = "Game created";
-    if (gameState == 2)
-      gameStateText = "Game playing";
-    if (gameState == 3) {
-      gameStateText = "Game paused";
+    if (gameState === 3) {
 
-      getScores();
+        gameStateText = "Game paused";
+        getScores();
 
-      var correctAnsIndex = status.correctAnswer;
+        let correctAnsIndex = status.correctAnswer + 1;
 
-      if (correctAnsIndex == 0)
-        document.getElementById("answer1").style.color = "green";
-      if (correctAnsIndex == 1)
-        document.getElementById("answer2").style.color = "green";
-      if (correctAnsIndex == 2)
-        document.getElementById("answer3").style.color = "green";
-      if (correctAnsIndex == 3)
-        document.getElementById("answer4").style.color = "green";
+        document.getElementById("answer" + correctAnsIndex).style.background = "green";
+
     } else {
-      document.getElementById("answer1").style.color = "black";
-      document.getElementById("answer2").style.color = "black";
-      document.getElementById("answer3").style.color = "black";
-      document.getElementById("answer4").style.color = "black";
+        for (let i = 1; i <= 4; i++)
+            document.getElementById("answer" + i).style.background = "";
+
 
     }
-    if (gameState == 4)
-      gameStateText = "Game finished";
+    if (gameState === 4)
+        gameStateText = "Game finished";
 
     document.getElementById("gameID").innerHTML = status.gameID;
     document.getElementById("playersConnected").innerHTML = playerText;
@@ -84,118 +71,198 @@
     document.getElementById("gameState").innerHTML = gameStateText;
 
 
-    newQuestion = (currentQuestion != currQuestion);
+    newQuestion = (currentQuestion !== currQuestion);
 
 
-    if (status.gameState == 6 && gameStarted == false) {
+    if (status.gameState === 6 && gameStarted === false) {
 
-      startGame();
-      gameStarted = true;
+        startGame();
+        gameStarted = true;
 
-    } else if (status.gameState == 2 && newQuestion) {
+    } else if (status.gameState === 2 && newQuestion) {
 
-      currentQuestion = currQuestion;
+        currentQuestion = currQuestion;
 
-      document.getElementById("pitanjeDiv").style.display = "block";
-      document.getElementById("question").innerHTML = status.question;
-      document.getElementById("answer1").innerHTML = status.answers[0];
-      document.getElementById("answer2").innerHTML = status.answers[1];
-      document.getElementById("answer3").innerHTML = status.answers[2];
-      document.getElementById("answer4").innerHTML = status.answers[3];
+        document.getElementById("pitanjeDiv").style.display = "block";
+        document.getElementById("question").innerHTML = status.question;
 
-      time = 20;
-      clearInterval(timer);
-      handleTimer();
-      timer = setInterval(function() {
+        for (let i = 1; i <= 4; i++)
+            document.getElementById("answer" + i).innerHTML = status.answers[i - 1];
+
+        time = 20;
+        clearInterval(timer);
         handleTimer();
-      }, 1000);
+        timer = setInterval(function () {
+            handleTimer();
+        }, 1000);
 
-      getScores();
+        getScores();
 
-    } else if (status.gameState == 4) {
-      document.getElementById("pitanjeDiv").style.display = "none";
-      getScores();
+    } else if (status.gameState === 4) {
+        document.getElementById("pitanjeDiv").style.display = "none";
+        getScores();
 
     }
 
-  }
+}
 
-  function startGame() {
+function startGame() {
+
+    if (ws) {
+        let gameStart = {};
+        gameStart.type = "scoreboard";
+        gameStart.method = "gameStart";
+        ws.send(JSON.stringify(gameStart));
+    } else {
+
+        var data = {};
+
+        data.gameStart = "1";
+
+        $.ajax({
+            type: "GET",
+            url: "./scoreboard.html",
+            data: data,
+            success: function (data) {
+                console.log("GAME STARTED!");
+
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
+
+}
+
+function getScores() {
+
+    if (ws) {
+
+    } else {
+
+        var data = {};
+
+        data.scores = "1";
+
+        console.log("Calling scores");
+
+        $.ajax({
+            type: "GET",
+            url: "./scoreboard.html",
+            data: data,
+            success: function (data) {
+                console.log("Calling scores returned");
+
+                handleScores(data);
+
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
+}
+
+
+function getStatus() {
 
     var data = {};
-
-    data.gameStart = "1";
-
-    $.ajax({
-      type: "GET",
-      url: "./scoreboard.html",
-      data: data,
-      success: function(data) {
-        console.log("GAME STARTED!");
-
-      },
-      error: function(error) {
-        console.log("Error:");
-        console.log(error);
-      }
-    });
-
-  }
-
-  function getScores() {
-
-    var data = {};
-
-    data.scores = "1";
-
-    console.log("Calling scores");
-
-    $.ajax({
-      type: "GET",
-      url: "./scoreboard.html",
-      data: data,
-      success: function(data) {
-        console.log("Calling scores returned");
-
-        handleScores(data);
-
-      },
-      error: function(error) {
-        console.log("Error:");
-        console.log(error);
-      }
-    });
-
-  }
-
-
-  function getStatus() {
-
-    var data = {};
-
 
 
     data.status = "1";
 
 
-
-
     $.ajax({
-      type: "GET",
-      url: "./scoreboard.html",
-      data: data,
-      success: function(data) {
-        handleStatus(data);
+        type: "GET",
+        url: "./scoreboard.html",
+        data: data,
+        success: function (data) {
+            handleStatus(data);
 
-      },
-      error: function(error) {
-        console.log("Error:");
-        console.log(error);
-      }
+        },
+        error: function (error) {
+            console.log("Error:");
+            console.log(error);
+        }
     });
 
-  }
+}
 
-  window.setInterval(function() {
-    getStatus(); //calling every .5 seconds
-  }, 200);
+function createGame() {
+
+    let formdata = $("#myform").serializeArray();
+    let data = {};
+    data.numberOfPlayers = parseInt(document.getElementById("numberOfPlayers").value);
+
+
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
+
+        ws.onopen = function () {
+
+            data.type = "scoreboard";
+            data.method = "gameInit";
+
+            // TODO: HAndle cookies in this case
+            // let sessionID = data["sessionID"];
+            //
+            // document.cookie = "sessionID=" + sessionID;
+            document.getElementById("myform").style.display = "none";
+            document.getElementById("scoreboardDiv").style.display = "block";
+
+            ws.send(JSON.stringify(data));
+        };
+
+        ws.onmessage = function (evt) {
+            let received_msg = JSON.parse(evt.data);
+
+            if (received_msg.gameState)
+                handleStatus(received_msg);
+            else
+                handleScores(received_msg);
+        };
+
+        ws.onclose = function () {
+
+            // websocket is closed.
+            alert("Connection is closed...");
+            ws = null;
+        };
+    } else {
+        $.ajax({
+            type: "POST",
+            url: "./index.html",
+            data: data,
+            success: function (data) {
+
+                let sessionID = data["sessionID"];
+
+                document.cookie = "sessionID=" + sessionID;
+                document.getElementById("myform").style.show = "none";
+                document.getElementById("scoreboardDiv").style.display = "show";
+                // The browser doesn't support WebSocket
+                alert("WebSocket NOT supported by your Browser!");
+                window.setInterval(function () {
+                    getStatus(); //calling every .5 seconds
+                }, 200);
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
+
+}
+
+
+window.onbeforeunload = function () {
+    alert("closing");
+    if (ws.readyState === WebSocket.OPEN)
+        ws.close();
+};
+
+

@@ -50,9 +50,19 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  Server server(argv);
+  auto threads = std::max<int>(1, std::atoi(argv[4]));
+  auto address = net::ip::make_address(argv[1]);
+  auto port = static_cast<unsigned short>(std::atoi(argv[2]));
+  auto doc_root = std::string(argv[3]);
 
-  server.run();
+  std::shared_ptr<Server> server = std::make_shared<Server>(threads, doc_root);
+
+  if (!server->init(tcp::endpoint{address, port})) {
+    std::cerr << "Init failed!\n";
+    return EXIT_FAILURE;
+  }
+
+  server->start();
 
   return EXIT_SUCCESS;
 }

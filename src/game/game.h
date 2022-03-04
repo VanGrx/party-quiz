@@ -1,11 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <condition_variable>
 #include <map>
 #include <mutex>
 #include <thread>
 #include <vector>
 
+#include "callbacks.h"
 #include "player.h"
 #include "question.h"
 #include "randomgenerator.h"
@@ -24,7 +26,8 @@ public:
     GAME_READY
   };
 
-  int createGame(unsigned int _playerNumber);
+  int createGame(unsigned int _playerNumber,
+                 std::shared_ptr<CallbackListener> _listener);
   void clearGame();
 
   void getQuestions();
@@ -41,6 +44,7 @@ public:
 
   Player getPlayer(int id);
 
+  void changeState(const GameState state_);
   void print();
 
   // Thread start and thread run functions
@@ -52,10 +56,14 @@ public:
 
   RandomGenerator rand;
 
+  std::shared_ptr<CallbackListener> callbackReceiver;
+
   std::vector<Question> questions;
   std::vector<Player> players;
 
   std::mutex gameMutex;
+  std::condition_variable cv;
+  bool questionFinished = false;
 
   int id = 0;
 

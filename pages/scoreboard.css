@@ -1,11 +1,12 @@
 body {
-  background: #E2E2E2;
-  color: #FF616D;
-  font-size: 45px;
-  text-align: center;
-  font-family: 'Mukta', sans-serif;
+    background: #E2E2E2;
+    color: #FF616D;
+    font-size: 45px;
+    text-align: center;
+    font-family: 'Mukta', sans-serif;
 
 }
+
 /*div {
   margin: auto;
   margin-top: 25px;
@@ -16,63 +17,63 @@ body {
 }*/
 
 header {
-  border-radius: 25px;
-  background-color: #0A2463;
-  padding: 30px;
-  text-align: center;
-  font-size: 35px;
-  color: white;
+    border-radius: 25px;
+    background-color: #0A2463;
+    padding: 30px;
+    text-align: center;
+    font-size: 35px;
+    color: white;
 
 }
 
-.block{
-  margin: auto;
-  margin-top: 25px;
-  margin-right: 25px;
-  border-radius: 25px;
-  border: 2px solid #66DE93;
-  padding: 20px;
-  text-align: center;
+.block {
+    margin: auto;
+    margin-top: 25px;
+    margin-right: 25px;
+    border-radius: 25px;
+    border: 2px solid #66DE93;
+    padding: 20px;
+    text-align: center;
 }
 
 
-.quizContainer{
-  margin: auto;
-  padding: 25px;
-  text-align: center;
-  width: 90%;
-  display: flex;
+.quizContainer {
+    margin: auto;
+    padding: 25px;
+    text-align: center;
+    width: 90%;
+    display: flex;
 }
 
 
-.answer{
-  border-radius: 25px;
-  border: 2px solid #FFEAC9;
-  margin: auto;
-  margin-top: -40px;
-  width: 40%;
-  
-}
-
-.questions{
-  background: #247BA0;
-  color: #E2E2E2;
-margin: 25px;
-width: 110%;
-padding: 5px;
+.answer {
+    border-radius: 25px;
+    border: 2px solid #FFEAC9;
+    margin: auto;
+    margin-top: -40px;
+    width: 40%;
 
 }
 
-.scores{
-  background: #FB3640;
-  color: #E2E2E2;
-margin: 25px;
-width: 40%;
+.questions {
+    background: #247BA0;
+    color: #E2E2E2;
+    margin: 25px;
+    width: 110%;
+    padding: 5px;
 
 }
 
-.playerScore{
-  
+.scores {
+    background: #FB3640;
+    color: #E2E2E2;
+    margin: 25px;
+    width: 40%;
+
+}
+
+.playerScore {
+
 }
 
 
