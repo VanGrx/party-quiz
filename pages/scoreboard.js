@@ -139,10 +139,7 @@ function startGame() {
 function getScores() {
 
     if (ws) {
-        let getScores = {};
-        getScores.type = "scoreboard";
-        getScores.method = "getScores";
-        ws.send(JSON.stringify(getScores));
+
     } else {
 
         var data = {};

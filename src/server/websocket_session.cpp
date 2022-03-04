@@ -208,14 +208,12 @@ void WebSocketSession::fail(beast::error_code ec, char const *what) {
 
 void WebSocketSession::gameStateChanged() {
 
-  std::string message = "";
-
-  if (playerID == 0)
-    message = callbackReceiver->getGameStatusJSONString();
-  else
-    message = callbackReceiver->getPlayerStatusJSONString(playerID);
-
-  do_write(message);
+  if (playerID == 0) {
+    do_write(callbackReceiver->getGameStatusJSONString());
+    do_write(callbackReceiver->getScoresJSONString());
+  } else {
+    do_write(callbackReceiver->getPlayerStatusJSONString(playerID));
+  }
 }
 
 template void WebSocketSession::do_accept<http::string_body>(
