@@ -101,6 +101,13 @@ void Game::playerAnswered(int id, int answerGiven) {
 
   player->gaveAnswer(currQuestion, answerGiven,
                      giveQuestion().correctAnswerIndex == answerGiven);
+
+  if (allPlayersAnswered()) {
+    std::unique_lock<std::mutex> lk(gameMutex);
+    questionFinished = true;
+    lk.unlock();
+    cv.notify_all();
+  }
 }
 
 void Game::getQuestions() {
@@ -127,15 +134,21 @@ void Game::playGame() {
 
   while (currQuestion < questions.size()) {
 
+    {
+      std::unique_lock<std::mutex> lk(gameMutex);
+      questionFinished = false;
+      lk.unlock();
+    }
+
     changeState(GAME_PLAYING);
 
-    unsigned timePassed = 0;
+    std::unique_lock<std::mutex> lk(gameMutex);
+    cv.wait_for(lk, std::chrono::seconds(ROUND_TIME),
+                [this] { return questionFinished; });
+    lk.unlock();
 
-    while (timePassed < ROUND_TIME && !allPlayersAnswered()) {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      timePassed++;
-    }
     changeState(GAME_PAUSED);
+
     std::this_thread::sleep_for(std::chrono::seconds(PAUSE_TIME));
 
     changeState(GAME_PREPARE);

@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <condition_variable>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -61,6 +62,8 @@ public:
   std::vector<Player> players;
 
   std::mutex gameMutex;
+  std::condition_variable cv;
+  bool questionFinished = false;
 
   int id = 0;
 
