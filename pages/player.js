@@ -9,12 +9,18 @@ function giveAnswer(index) {
 
     let data = {};
 
-    data["answer"] = index;
+    data["answer"] = parseInt(index);
     data["playerID"] = document.getElementById("playerID").innerHTML;
 
     answerGiven = true;
 
     if (ws) {
+
+        data["type"] = "player";
+        data["method"] = "giveAnswer";
+
+        ws.send(JSON.stringify(data));
+        handlePlayerAnswerGiven();
 
     } else {
 
@@ -77,14 +83,9 @@ function handlePlayerStatus(status) {
 
 function getPlayerStatus() {
 
-    var data = {};
+    let data = {};
 
     data["status"] = "1";
-
-    var res = JSON.stringify(data)
-
-    console.log(res);
-
 
     $.ajax({
         type: "GET",
@@ -105,7 +106,7 @@ function getPlayerStatus() {
 function loginGame() {
 
     let data = {};
-    data.roomNumber = parseInt(document.getElementById("numberOfPlayers").value);
+    data.roomNumber = parseInt(document.getElementById("roomNumber").value);
     data.username = document.getElementById("username").value;
 
 
@@ -115,18 +116,18 @@ function loginGame() {
         ws.onopen = function () {
             data.type = "player";
             data.method = "gameInit";
-            ws.send(JSON.stringify(gameInit));
-            document.getElementById("myform").style.show = "none";
-            document.getElementById("quizDiv").style.display = "show";
+            ws.send(JSON.stringify(data));
+            document.getElementById("myform").style.display = "none";
+            document.getElementById("quizDiv").style.display = "block";
         };
 
         ws.onmessage = function (evt) {
 
             let received_msg = JSON.parse(evt.data);
-            if (received_msg.gameState)
+
+            if (received_msg.player)
                 handlePlayerStatus(received_msg);
-            else
-                handleScores(received_msg);
+
         };
 
         ws.onclose = function () {
