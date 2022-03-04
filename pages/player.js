@@ -7,27 +7,31 @@ let ws = null;
 function giveAnswer(index) {
 
 
-    var data = {};
+    let data = {};
 
     data["answer"] = index;
     data["playerID"] = document.getElementById("playerID").innerHTML;
 
     answerGiven = true;
 
-    $.ajax({
-        type: "POST",
-        url: "./player.html",
-        data: data,
-        success: function (data) {
-            handlePlayerAnswerGiven();
+    if (ws) {
 
-        },
-        error: function (error) {
-            console.log("Error:");
-            handlePlayerAnswerGiven();
-        }
-    });
+    } else {
 
+        $.ajax({
+            type: "POST",
+            url: "./player.html",
+            data: data,
+            success: function (data) {
+                handlePlayerAnswerGiven();
+
+            },
+            error: function (error) {
+                console.log("Error:");
+                handlePlayerAnswerGiven();
+            }
+        });
+    }
 }
 
 
@@ -98,40 +102,68 @@ function getPlayerStatus() {
 
 }
 
-if ("WebSocket" in window) {
+function loginGame() {
 
-    ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
+    let data = {};
+    data.roomNumber = parseInt(document.getElementById("numberOfPlayers").value);
+    data.username = document.getElementById("username").value;
 
-    ws.onopen = function () {
 
-        let gameInit = {};
-        gameInit.type = "player";
-        gameInit.method = "gameInit";
-        gameInit.roomNumber = 1;
-        gameInit.username = "Igor";
-        ws.send(JSON.stringify(gameInit));
-    };
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
 
-    ws.onmessage = function (evt) {
+        ws.onopen = function () {
+            data.type = "player";
+            data.method = "gameInit";
+            ws.send(JSON.stringify(gameInit));
+            document.getElementById("myform").style.show = "none";
+            document.getElementById("quizDiv").style.display = "show";
+        };
 
-        console.log("MESSAGE: " + evt.data);
+        ws.onmessage = function (evt) {
 
-        let received_msg = JSON.parse(evt.data);
-        if (received_msg.gameState)
-            handlePlayerStatus(received_msg);
-        else
-            handleScores(received_msg);
-    };
+            let received_msg = JSON.parse(evt.data);
+            if (received_msg.gameState)
+                handlePlayerStatus(received_msg);
+            else
+                handleScores(received_msg);
+        };
 
-    ws.onclose = function () {
+        ws.onclose = function () {
 
-        // websocket is closed.
-        alert("Connection is closed...");
-        ws = null;
-    };
-} else {
-    window.setInterval(function () {
-        getPlayerStatus();  //calling every .5 seconds
-    }, 200);
+            // websocket is closed.
+            alert("Connection is closed...");
+            ws = null;
+        };
+    } else {
+        $.ajax({
+            type: "POST",
+            url: "./player.html",
+            data: data,
+            success: function (data) {
+
+                let sessionID = data["sessionID"];
+
+                document.cookie = "sessionID=" + sessionID;
+
+                document.getElementById("myform").style.show = "none";
+                document.getElementById("quizDiv").style.display = "show";
+
+                window.setInterval(function () {
+                    getPlayerStatus();  //calling every .5 seconds
+                }, 200);
+            },
+            error: function (error) {
+                console.log("Error:");
+                console.log(error);
+            }
+        });
+    }
+
 }
 
+window.onbeforeunload = function () {
+    alert("closing");
+    if (ws.readyState === WebSocket.OPEN)
+        ws.close();
+};
