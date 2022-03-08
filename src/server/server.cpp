@@ -266,4 +266,4 @@ void Server::stateChanged(int gameID) {
     if (ws->getGameID() == gameID)
       ws->gameStateChanged();
   }
-};
+}

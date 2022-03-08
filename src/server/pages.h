@@ -11,6 +11,6 @@ const std::string scoreboardPage = "/scoreboard.html";
 const std::string playerInitPage = "/playerInit.html";
 const std::string playerPage = "/player.html";
 
-}; // namespace pages
+} // namespace pages
 
 #endif // PAGES_H
