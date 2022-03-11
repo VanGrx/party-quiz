@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
 
   if (!checkArguments(argc, argv)) {
     std::cerr
-        << "Usage: http-server-async <address> <port> <doc_root> <threads>\n"
+        << "Usage: PartyQuiz <address> <port> <doc_root> <threads>\n"
         << "Example:\n"
-        << "    http-server-async 0.0.0.0 8080 . 1\n";
+        << "   PartyQuiz 0.0.0.0 8080 . 1\n";
     return EXIT_FAILURE;
   }
 
