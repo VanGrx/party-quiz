@@ -54,6 +54,13 @@ add_executable(PartyQuiz
   ${game_source_files}
   )
 
-target_compile_options(PartyQuiz PRIVATE -Wall -Wextra -pedantic -Werror)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(WARNING_FLAGS "-W4")
+else()
+  set(WARNING_FLAGS "-Wall" "-pedantic" "-Werror" "-Wextra")
+endif()
+
+target_compile_options(PartyQuiz PRIVATE ${WARNING_FLAGS})
 
 target_link_libraries(PartyQuiz ${Boost_LIBRARIES} ${CURL_LIBRARIES})
