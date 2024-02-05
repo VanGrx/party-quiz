@@ -119,8 +119,10 @@ std::string Server::getGameStatusJSONString() {
 
   d.AddMember("gameState", game.state, d.GetAllocator());
   d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
-  d.AddMember("playersEntered", (unsigned)game.players.size(), d.GetAllocator());
-  d.AddMember("totalQuestions", (unsigned)game.questions.size(), d.GetAllocator());
+  d.AddMember("playersEntered", (unsigned)game.players.size(),
+              d.GetAllocator());
+  d.AddMember("totalQuestions", (unsigned)game.questions.size(),
+              d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
   if (game.gameRunning() || game.gamePaused()) {
@@ -162,8 +164,10 @@ std::string Server::getPlayerStatusJSONString(int id) {
 
   d.AddMember("gameState", game.state, d.GetAllocator());
   d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
-  d.AddMember("playersEntered", (unsigned)game.players.size(), d.GetAllocator());
-  d.AddMember("totalQuestions", (unsigned)game.questions.size(), d.GetAllocator());
+  d.AddMember("playersEntered", (unsigned)game.players.size(),
+              d.GetAllocator());
+  d.AddMember("totalQuestions", (unsigned)game.questions.size(),
+              d.GetAllocator());
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
   Player player = game.getPlayer(id);
