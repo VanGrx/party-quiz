@@ -111,7 +111,10 @@ function loginGame() {
 
 
     if ("WebSocket" in window) {
-        ws = new WebSocket("ws://192.168.1.2:8080/webSocket");
+
+        let host = window.location.host;
+        let ws_url ="ws://"+host+"/webSocket";
+        ws = new WebSocket(ws_url);
 
         ws.onopen = function () {
             data.type = "player";
