@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include <condition_variable>
-#include <map>
 #include <mutex>
 #include <thread>
 #include <vector>

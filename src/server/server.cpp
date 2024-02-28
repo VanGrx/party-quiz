@@ -3,6 +3,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "utils.h"
+
 Server::Server(int threads_, std::string &doc_root)
     : threads{threads_}, doc_root_{std::make_shared<std::string>(doc_root)},
       ioc_{threads}, acceptor_(net::make_strand(ioc_)) {}

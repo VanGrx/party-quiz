@@ -4,7 +4,10 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "utils.h"
 #include "websocket_session.h"
+
+namespace net = boost::asio; // from <boost/asio.hpp>
 
 void HttpSession::do_close() {
   // Send a TCP shutdown

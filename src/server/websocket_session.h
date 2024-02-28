@@ -1,7 +1,6 @@
 #ifndef WEBSOCKET_SESSION_H
 #define WEBSOCKET_SESSION_H
 
-#include <algorithm>
 #include <boost/asio/bind_executor.hpp>
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/signal_set.hpp>
@@ -13,12 +12,10 @@
 #include <boost/make_unique.hpp>
 #include <boost/optional.hpp>
 #include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <rapidjson/document.h>
 #include <string>
-#include <thread>
 #include <vector>
 
 class CallbackListener;
@@ -26,7 +23,6 @@ class CallbackListener;
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 // Echoes back all received WebSocket messages

@@ -1,6 +1,5 @@
 #include "websocket_session.h"
 #include "callbacks.h"
-#include <algorithm>
 #include <cstdlib>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>

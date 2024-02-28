@@ -1,6 +1,6 @@
 #include "randomgenerator.h"
-#include <functional>
-#include <memory>
+#include <cstdlib>
+#include <ctime>
 
 RandomGenerator::RandomGenerator(int _limit) : limit{_limit} {
   srand(time(nullptr));

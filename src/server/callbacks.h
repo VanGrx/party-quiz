@@ -3,7 +3,6 @@
 
 #include "question.h"
 #include "websocket_session.h"
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
