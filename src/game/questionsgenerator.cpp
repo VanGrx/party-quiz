@@ -37,8 +37,7 @@ std::vector<Question> QuestionsGenerator::collectQuestions() {
 
   std::vector<Question> questions;
 
-  std::string response = curlCollect(
-      "https://opentdb.com/api.php?amount=10&type=multiple&encode=base64");
+  std::string response = curlCollect(questionsUrl);
 
   if (response == "")
     return {};

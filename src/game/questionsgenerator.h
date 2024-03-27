@@ -8,6 +8,11 @@
 static const std::string b =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; //=
 
+static const std::string numberOfQuestions = "10";
+static const std::string questionsUrl =
+    "https://opentdb.com/api.php?amount=" + numberOfQuestions +
+    "&type=multiple&encode=base64";
+
 class QuestionsGenerator {
 public:
   class Base64 {
