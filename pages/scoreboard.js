@@ -35,7 +35,7 @@ function handleScores(scores) {
 
 function handleStatus(status) {
 
-    let playerText = status.playersEntered + "/" + status.playerNumber;
+    let playerText = status.playersEntered;
     let currQuestion = status.currQuestion + 1;
     let questionText = currQuestion + "/" + status.totalQuestions;
     let gameState = status.gameState;
@@ -193,9 +193,7 @@ function getStatus() {
 
 function createGame() {
 
-    let formdata = $("#myform").serializeArray();
     let data = {};
-    data.numberOfPlayers = parseInt(document.getElementById("numberOfPlayers").value);
 
 
     if ("WebSocket" in window) {
@@ -212,7 +210,6 @@ function createGame() {
             // let sessionID = data["sessionID"];
             //
             // document.cookie = "sessionID=" + sessionID;
-            document.getElementById("myform").style.display = "none";
             document.getElementById("scoreboardDiv").style.display = "block";
 
             ws.send(JSON.stringify(data));
@@ -243,7 +240,6 @@ function createGame() {
                 let sessionID = data["sessionID"];
 
                 document.cookie = "sessionID=" + sessionID;
-                document.getElementById("myform").style.show = "none";
                 document.getElementById("scoreboardDiv").style.display = "show";
                 // The browser doesn't support WebSocket
                 alert("WebSocket NOT supported by your Browser!");
@@ -265,6 +261,11 @@ window.onbeforeunload = function () {
     alert("closing");
     if (ws.readyState === WebSocket.OPEN)
         ws.close();
+};
+
+
+window.onload = function () {
+    createGame();
 };
 
 
