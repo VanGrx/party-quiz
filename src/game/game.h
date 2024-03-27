@@ -25,8 +25,7 @@ public:
     GAME_READY
   };
 
-  int createGame(unsigned int _playerNumber,
-                 std::shared_ptr<CallbackListener> _listener);
+  int createGame(std::shared_ptr<CallbackListener> _listener);
   void clearGame();
 
   void getQuestions();
@@ -68,7 +67,6 @@ public:
 
   GameState state = GAME_NULL;
 
-  unsigned int playerNumber = 0;
   unsigned int currQuestion = 0;
 };
 

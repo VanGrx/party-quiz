@@ -11,7 +11,7 @@ class CallbackListener {
 
 public:
   // Scoreboard callbacks
-  virtual int gameInitCallback(int playerCount) = 0;
+  virtual int gameInitCallback() = 0;
   virtual std::vector<std::pair<std::string, unsigned int>> getScores() = 0;
   virtual Question getQuestion() = 0;
   virtual std::string getGameStatusJSONString() = 0;

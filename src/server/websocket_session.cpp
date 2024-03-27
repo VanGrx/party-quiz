@@ -74,13 +74,8 @@ void WebSocketSession::handleScoreboardRequest(
     return do_write("Bad json file given");
 
   if (document["method"] == "gameInit") {
-    if (!document.HasMember("numberOfPlayers") ||
-        !document["numberOfPlayers"].IsInt())
-      return do_write("Bad json file given");
 
-    int playerNumber = document["numberOfPlayers"].GetInt();
-
-    gameID = callbackReceiver->gameInitCallback(playerNumber);
+    gameID = callbackReceiver->gameInitCallback();
 
     std::string message = callbackReceiver->getGameStatusJSONString();
 

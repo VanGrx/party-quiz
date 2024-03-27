@@ -34,7 +34,7 @@ class Server final : public std::enable_shared_from_this<Server>,
 
 public:
   // Scoreboard callback
-  virtual int gameInitCallback(int playerCount) override;
+  virtual int gameInitCallback() override;
   virtual std::vector<std::pair<std::string, unsigned int>>
   getScores() override;
   virtual Question getQuestion() override;

@@ -93,10 +93,7 @@ void Server::on_accept(beast::error_code ec, tcp::socket socket) {
 //////////////////////////////////////////////////////////////////////////
 /// Callbacks
 
-int Server::gameInitCallback(int playerCount) {
-
-  return game.createGame(playerCount, shared_from_this());
-}
+int Server::gameInitCallback() { return game.createGame(shared_from_this()); }
 
 std::vector<std::pair<std::string, unsigned int>> Server::getScores() {
 
@@ -120,7 +117,6 @@ std::string Server::getGameStatusJSONString() {
   d.AddMember("gameID", game.id, d.GetAllocator());
 
   d.AddMember("gameState", game.state, d.GetAllocator());
-  d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
   d.AddMember("playersEntered", (unsigned)game.players.size(),
               d.GetAllocator());
   d.AddMember("totalQuestions", (unsigned)game.questions.size(),
@@ -165,7 +161,6 @@ std::string Server::getPlayerStatusJSONString(int id) {
   d.SetObject();
 
   d.AddMember("gameState", game.state, d.GetAllocator());
-  d.AddMember("playerNumber", game.playerNumber, d.GetAllocator());
   d.AddMember("playersEntered", (unsigned)game.players.size(),
               d.GetAllocator());
   d.AddMember("totalQuestions", (unsigned)game.questions.size(),

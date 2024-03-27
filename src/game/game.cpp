@@ -7,12 +7,10 @@
 
 Game::Game() : rand(MAX_ID) {}
 
-int Game::createGame(unsigned int _playerNumber,
-                     std::shared_ptr<CallbackListener> _listener) {
+int Game::createGame(std::shared_ptr<CallbackListener> _listener) {
   clearGame();
   id = rand.getNextRandom();
   callbackReceiver = _listener;
-  playerNumber = _playerNumber;
   if (questionCacheThread.joinable())
     questionCacheThread.join();
   questionCacheThread = std::thread(&Game::getQuestions, this);
@@ -37,8 +35,8 @@ int Game::addPlayer(std::string name) {
 
   players.emplace_back(id, name);
 
-  if (players.size() == playerNumber)
-    changeState(GAME_READY);
+  // TODO: Add this when main player says to start
+  //  changeState(GAME_READY);
 
   return id;
 }

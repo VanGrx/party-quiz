@@ -338,15 +338,7 @@ void HttpSession::handleScoreboardRequest(
     std::map<std::string, std::string> parsed_values =
         parseRequestBody(req.body());
 
-    // Only 1 value is needed: numberOfPlayers
-    if (parsed_values.size() != 1 || parsed_values["numberOfPlayers"] == "") {
-      return send(createErrorResponse(std::move(req), http::status::bad_request,
-                                      "Multiple params given!"));
-    }
-
-    int playerNumber = stoi(parsed_values["numberOfPlayers"]);
-
-    int gameID = callbackReceiver->gameInitCallback(playerNumber);
+    int gameID = callbackReceiver->gameInitCallback();
 
     std::string message = createPageRedirect(gameID, pages::scoreboardPage);
 
