@@ -64,6 +64,7 @@ public:
   bool questionFinished = false;
 
   int id = 0;
+  int mainPlayerID = 0;
 
   GameState state = GAME_NULL;
 

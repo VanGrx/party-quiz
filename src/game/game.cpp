@@ -33,6 +33,10 @@ int Game::addPlayer(std::string name) {
          }) != players.end())
     id = rand.getNextRandom();
 
+  if (players.empty()) {
+    mainPlayerID = id;
+  }
+
   players.emplace_back(id, name);
 
   // TODO: Add this when main player says to start
