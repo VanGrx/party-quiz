@@ -321,7 +321,7 @@ void HttpSession::handleScoreboardRequest(
 
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["gameStart"] != "") {
-      callbackReceiver->startGame();
+      //callbackReceiver->startGame();
       std::string message = "{}";
       return returnRequestedJSON(message, std::move(req), send);
     } else if (parsed_values["scores"] != "") {

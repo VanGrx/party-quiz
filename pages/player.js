@@ -103,6 +103,39 @@ function getPlayerStatus() {
 
 }
 
+function startGame() {
+  
+
+    let data = {};
+
+    data["playerID"] = document.getElementById("playerID").innerHTML;
+
+
+    if (ws) {
+
+        data["type"] = "player";
+        data["method"] = "startGame";
+
+        ws.send(JSON.stringify(data));
+
+    } else {
+
+        $.ajax({
+            type: "POST",
+            url: "./player.html",
+            data: data,
+            success: function (data) {
+
+            },
+            error: function (error) {
+                console.log("Error:");
+            }
+        });
+    }
+
+
+}
+
 function loginGame() {
 
     let data = {};

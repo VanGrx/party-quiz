@@ -60,6 +60,9 @@ void WebSocketSession::handlePlayerRequest(
     std::string message = callbackReceiver->getPlayerStatusJSONString(playerID);
 
     do_write(message);
+  } else if (document["method"] == "startGame") {
+    callbackReceiver->startGame(playerID);
+
   } else if (document["method"] == "giveAnswer") {
     if (!document.HasMember("answer") || !document["answer"].IsNumber())
       return do_write("Bad json file given");
@@ -81,7 +84,7 @@ void WebSocketSession::handleScoreboardRequest(
 
     do_write(message);
   } else if (document["method"] == "gameStart") {
-    callbackReceiver->startGame();
+    //callbackReceiver->startGame();
   } else if (document["method"] == "getScores") {
     std::string message = callbackReceiver->getScoresJSONString();
     do_write(message);

@@ -102,8 +102,8 @@ std::vector<std::pair<std::string, unsigned int>> Server::getScores() {
 
 Question Server::getQuestion() { return game.giveQuestion(); }
 
-void Server::startGame() {
-  if (game.gameReady())
+void Server::startGame(int playerID) {
+  if (game.gameCreated() && playerID == game.mainPlayerID)
     game.startGame();
 }
 

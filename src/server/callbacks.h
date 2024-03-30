@@ -16,7 +16,7 @@ public:
   virtual Question getQuestion() = 0;
   virtual std::string getGameStatusJSONString() = 0;
   virtual std::string getPlayerStatusJSONString(int id) = 0;
-  virtual void startGame() = 0;
+  virtual void startGame(int playerID) = 0;
   virtual std::string getScoresJSONString() = 0;
   virtual bool gameExists(int id) = 0;
 

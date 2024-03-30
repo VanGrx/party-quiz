@@ -30,6 +30,7 @@ public:
 
   void getQuestions();
   bool gameReady();
+  bool gameCreated();
   int addPlayer(std::string name);
   Question giveQuestion();
   bool nextRound();
@@ -43,6 +44,7 @@ public:
   Player getPlayer(int id);
 
   void changeState(const GameState state_);
+  void playerAdded();
   void print();
 
   // Thread start and thread run functions

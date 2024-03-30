@@ -39,11 +39,18 @@ int Game::addPlayer(std::string name) {
 
   players.emplace_back(id, name);
 
+  playerAdded();
+
   // TODO: Add this when main player says to start
   //  changeState(GAME_READY);
 
   return id;
 }
+
+void Game::playerAdded() {
+    callbackReceiver->stateChanged(id);
+}
+
 
 Question Game::giveQuestion() { return questions[currQuestion]; }
 
@@ -59,6 +66,8 @@ bool Game::gameRunning() { return state == GAME_PLAYING; }
 bool Game::gamePaused() { return state == GAME_PAUSED; }
 
 bool Game::gameReady() { return state == GAME_READY; }
+
+bool Game::gameCreated() { return state == GAME_CREATED; }
 
 bool Game::allPlayersAnswered() {
 
