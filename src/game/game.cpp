@@ -47,10 +47,7 @@ int Game::addPlayer(std::string name) {
   return id;
 }
 
-void Game::playerAdded() {
-    callbackReceiver->stateChanged(id);
-}
-
+void Game::playerAdded() { callbackReceiver->stateChanged(id); }
 
 Question Game::giveQuestion() { return questions[currQuestion]; }
 
