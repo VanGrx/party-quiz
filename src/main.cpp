@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     std::cerr << "Error connecting to the internet\n";
   }
 
-  auto threads = std::max<int>(1, std::thread::hardware_concurrency()/2);
+  auto threads = std::max<int>(1, std::thread::hardware_concurrency() / 2);
   auto address = net::ip::make_address(ip_address_str);
   auto port = static_cast<unsigned short>(std::atoi(argv[1]));
   auto doc_root = std::string(argv[2]);
