@@ -21,10 +21,10 @@ bool has_only_digits(const std::string &s) {
 
 bool checkArguments(int argc, char *argv[]) {
 
-  if (argc != 4)
+  if (argc != 3)
     return false;
 
-  if (!has_only_digits(argv[1]) || !has_only_digits(argv[3]))
+  if (!has_only_digits(argv[1]))
     return false;
 
   return true;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   if (!checkArguments(argc, argv)) {
     std::cerr << "Usage: PartyQuiz <port> <doc_root> <threads>\n"
               << "Example:\n"
-              << "   PartyQuiz 8080 . 1\n";
+              << "   PartyQuiz 8080 . \n";
     return EXIT_FAILURE;
   }
 
@@ -77,10 +77,10 @@ int main(int argc, char *argv[]) {
     std::cerr << "Error connecting to the internet\n";
   }
 
-  auto threads = std::max<int>(1, std::atoi(argv[3]));
+  auto threads = std::max<int>(1, std::thread::hardware_concurrency()/2);
   auto address = net::ip::make_address(ip_address_str);
   auto port = static_cast<unsigned short>(std::atoi(argv[1]));
-  auto doc_root = std::string(argv[3]);
+  auto doc_root = std::string(argv[2]);
 
   std::shared_ptr<Server> server = std::make_shared<Server>(threads, doc_root);
 
@@ -89,7 +89,8 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  std::cout << "Listening on " << ip_address_str << "\n";
+  std::cout << "Listening on " << ip_address_str << " with " << threads
+            << " threads\n";
 
   server->start();
 
