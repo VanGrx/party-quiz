@@ -207,25 +207,26 @@ void HttpSession::handlePlayerRequest(
         parseRequestTarget(std::string(req.target()));
 
     // Just give the page if no params are given
-    if (parsed_values.empty())
-      return returnRequestedPage(path_cat(doc_root, req.target()),
+    if (parsed_values.empty() || parsed_values["status"] == "") {
+      std::string targetResource = std::string(req.target());
+
+      size_t pos = targetResource.find('?');
+      targetResource = targetResource.substr(0, pos);
+      return returnRequestedPage(path_cat(doc_root, targetResource),
                                  std::move(req), send);
-
-    if (parsed_values["status"] != "") {
-
-      auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
-
-      if (cookieList["sessionID"] == "")
-        return send(createErrorResponse(std::move(req),
-                                        http::status::bad_request,
-                                        "Cookie with session ID not found!"));
-
-      int id = std::stoi(cookieList["sessionID"]);
-
-      std::string message = callbackReceiver->getPlayerStatusJSONString(id);
-
-      return returnRequestedJSON(message, std::move(req), send);
     }
+
+    auto cookieList = parseBasicCookie(std::string(req[http::field::cookie]));
+
+    if (cookieList["sessionID"] == "")
+      return send(createErrorResponse(std::move(req), http::status::bad_request,
+                                      "Cookie with session ID not found!"));
+
+    int id = std::stoi(cookieList["sessionID"]);
+
+    std::string message = callbackReceiver->getPlayerStatusJSONString(id);
+
+    return returnRequestedJSON(message, std::move(req), send);
   }
 
   // Respond to POST request
