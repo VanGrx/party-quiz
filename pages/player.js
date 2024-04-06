@@ -204,3 +204,14 @@ window.onbeforeunload = function () {
     if (ws.readyState === WebSocket.OPEN)
         ws.close();
 };
+
+
+
+window.onload = function () {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('roomNumber')) {
+        document.getElementById("roomNumber").value = searchParams.get('roomNumber');
+    }
+};
+
+

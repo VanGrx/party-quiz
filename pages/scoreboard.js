@@ -8,6 +8,8 @@ let timer;
 
 let ws = null;
 
+let qrcode = null;
+
 function handleTimer() {
 
     document.getElementById("countdown").innerHTML = time;
@@ -64,6 +66,12 @@ function handleStatus(status) {
     }
     if (gameState === 4)
         gameStateText = "Game finished";
+
+
+    let page = window.location.host+"/player.html?roomNumber="+status.gameID;
+    if (qrcode == null) {
+        qrcode = new QRCode(document.getElementById("qrcode"), page);
+    }
 
     document.getElementById("gameID").innerHTML = status.gameID;
     document.getElementById("playersConnected").innerHTML = playerText;
