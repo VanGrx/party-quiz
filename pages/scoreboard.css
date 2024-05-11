@@ -1,6 +1,4 @@
 body {
-    background: #E2E2E2;
-    color: #FF616D;
     font-size: 45px;
     text-align: center;
     font-family: 'Mukta', sans-serif;
@@ -18,11 +16,9 @@ body {
 
 header {
     border-radius: 25px;
-    background-color: #0A2463;
     padding: 30px;
     text-align: center;
     font-size: 35px;
-    color: white;
 
 }
 
@@ -56,8 +52,6 @@ header {
 }
 
 .questions {
-    background: #247BA0;
-    color: #E2E2E2;
     margin: 25px;
     width: 110%;
     padding: 5px;
@@ -65,8 +59,6 @@ header {
 }
 
 .scores {
-    background: #FB3640;
-    color: #E2E2E2;
     margin: 25px;
     width: 40%;
 
