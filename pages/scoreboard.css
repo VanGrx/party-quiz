@@ -41,6 +41,10 @@ header {
     display: flex;
 }
 
+#pitanjeDiv {
+    display: none;
+}
+
 
 .answer {
     border-radius: 25px;

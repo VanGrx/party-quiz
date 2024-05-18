@@ -43,8 +43,15 @@ function handleStatus(status) {
     let gameState = status.gameState;
     let gameStateText = "Not Ready";
 
-    if (gameState === 1)
+    if (gameState === 1) {
+        let page = window.location.host+"/player.html?roomNumber="+status.gameID;
+        if (qrcode == null) {
+            qrcode = new QRCode(document.getElementById("qrcode"), page);
+        }
         gameStateText = "Game created";
+    } else {
+        document.getElementById("qrcode").style.display = "none";
+    }
 
     if (gameState === 2)
         gameStateText = "Game playing";
@@ -68,10 +75,7 @@ function handleStatus(status) {
         gameStateText = "Game finished";
 
 
-    let page = window.location.host+"/player.html?roomNumber="+status.gameID;
-    if (qrcode == null) {
-        qrcode = new QRCode(document.getElementById("qrcode"), page);
-    }
+
 
     document.getElementById("gameID").innerHTML = status.gameID;
     document.getElementById("playersConnected").innerHTML = playerText;
