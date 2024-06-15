@@ -16,16 +16,20 @@ body {
 
 .answer {
     transition-duration: 0.4s;
+    color: white;
+    background-color: black;
 }
 
-.answer:hover {
-    background-color: black;
-    color: white;
-
+@media(hover: hover) {
+    .answer:hover {
+        color: black;
+        background-color: white;
+    }
 }
 
 .answer:active {
-    background-color: white;
+  color: black;
+  background-color: white;
 }
 
 header {
