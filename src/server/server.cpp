@@ -124,15 +124,15 @@ std::string Server::getGameStatusJSONString() {
   d.AddMember("currQuestion", game.currQuestion, d.GetAllocator());
 
   if (game.gameRunning() || game.gamePaused()) {
-    Question q = game.giveQuestion();
+    Question question = game.giveQuestion();
 
-    rapidjson::Value jsonQ(q.question.c_str(), q.question.size(),
+    rapidjson::Value jsonQ(question.question.c_str(), question.question.size(),
                            d.GetAllocator());
     d.AddMember("question", jsonQ, d.GetAllocator());
 
     rapidjson::Value jsonA(rapidjson::kArrayType);
 
-    for (auto &it : q.answers) {
+    for (auto &it : question.answers) {
       rapidjson::Value ans(it.c_str(), it.size(), d.GetAllocator());
 
       jsonA.PushBack(ans, d.GetAllocator());
@@ -140,8 +140,11 @@ std::string Server::getGameStatusJSONString() {
 
     d.AddMember("answers", jsonA, d.GetAllocator());
 
+    d.AddMember("roundTime", game.getRoundTime(), d.GetAllocator());
+
     if (game.gamePaused()) {
-      d.AddMember("correctAnswer", q.correctAnswerIndex, d.GetAllocator());
+      d.AddMember("correctAnswer", question.correctAnswerIndex, d.GetAllocator());
+      d.AddMember("pauseTime", game.getPauseTime(), d.GetAllocator());
     }
   }
 

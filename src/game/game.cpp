@@ -1,6 +1,7 @@
 #include "game.h"
 #include "gameconfig.h"
 
+#include <cstdint>
 #include <thread>
 
 #include "questionsgenerator.h"
@@ -50,6 +51,10 @@ int Game::addPlayer(std::string name) {
 void Game::playerAdded() { callbackReceiver->stateChanged(id); }
 
 Question Game::giveQuestion() { return questions[currQuestion]; }
+
+uint8_t Game::getRoundTime() { return ROUND_TIME; }
+
+uint8_t Game::getPauseTime() { return PAUSE_TIME; }
 
 bool Game::nextRound() {
   currQuestion++;

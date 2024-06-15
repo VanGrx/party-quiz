@@ -34,6 +34,15 @@ function handleScores(scores) {
 
 }
 
+function setupTimer(gotTime) {
+        time = gotTime;
+        clearInterval(timer);
+        handleTimer();
+        timer = setInterval(function () {
+            handleTimer();
+        }, 1000);
+}
+
 
 function handleStatus(status) {
 
@@ -62,6 +71,8 @@ function handleStatus(status) {
         getScores();
 
         let correctAnsIndex = status.correctAnswer + 1;
+
+        setupTimer(status.pauseTime); 
 
         document.getElementById("answer" + correctAnsIndex).style.background = "green";
 
@@ -101,12 +112,9 @@ function handleStatus(status) {
         for (let i = 1; i <= 4; i++)
             document.getElementById("answer" + i).innerHTML = status.answers[i - 1];
 
-        time = 20;
-        clearInterval(timer);
-        handleTimer();
-        timer = setInterval(function () {
-            handleTimer();
-        }, 1000);
+        setupTimer(status.roundTime);
+
+
 
         getScores();
 

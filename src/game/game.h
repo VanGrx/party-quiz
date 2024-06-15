@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <condition_variable>
+#include <cstdint>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -33,6 +34,8 @@ public:
   bool gameCreated();
   int addPlayer(std::string name);
   Question giveQuestion();
+  uint8_t getRoundTime();
+  uint8_t getPauseTime();
   bool nextRound();
   bool gameFinished();
   bool gameRunning();
